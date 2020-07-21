@@ -5,4 +5,3 @@
 
 *Generates CRUD given an SQL migration (upgrade.sql) file according to
 [nymann/fastapi-template](https://github.com/nymann/fastapi-template).*
-

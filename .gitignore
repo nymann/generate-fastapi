@@ -1,4 +1,6 @@
 src/fastapi_code_generator/version.py
+*.sql
+.history
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
