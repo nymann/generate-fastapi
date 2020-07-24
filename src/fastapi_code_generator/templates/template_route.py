@@ -6,13 +6,13 @@ only knows which methods it can call in SINGULAR Service but nothing about the
 database.
 """
 
-import fastapi
 import pydantic
-from starlette import status
 
 from PROJECT_NAME.core import security
 from PROJECT_NAME.core import service_factory
 from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
+import fastapi
+from starlette import status
 
 router = fastapi.APIRouter()
 

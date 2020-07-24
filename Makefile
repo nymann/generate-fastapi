@@ -31,7 +31,7 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 
 lint:
 	@pip install yapf pylint 'isort<5.0'
-	@yapf --style google -dpr src tests
+	@yapf --exclude '**/template_*.py' --style google -dpr src tests
 	@pylint --rcfile=setup.cfg -r n src tests > pylint.txt
 
 install: ${VERSION}
@@ -43,7 +43,7 @@ test: install
 fix: hooks
 	@pip install yapf pylint 'isort<5.0'
 	@isort --recursive src tests
-	@yapf --style google -ipr src tests
+	@yapf --exclude '**/template_*.py' --style google -dpr src tests
 	@pylint --rcfile=setup.cfg src tests
 
 clean:

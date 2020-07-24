@@ -1,11 +1,10 @@
 """Example Google style docstrings.
 
 """
+from PROJECT_NAME.core import config_loader
 from gino.ext import starlette  # pylint: disable=no-name-in-module
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy_utils import EmailType
-
-from PROJECT_NAME.core import config_loader
 
 DB = starlette.Gino(
     dsn=config_loader.DB_DSN,
