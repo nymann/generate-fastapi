@@ -1,5 +1,4 @@
-"""General test of CRUD
-"""
+"""General test of CRUD."""
 from tests import test_PLURAL
 
 
@@ -12,7 +11,7 @@ def test_crud(client):
     request = {RANDOM_MOCKDATA}
     # create
     data = test_PLURAL.create_SINGULAR(client, **request)
-    PRIMARY_KEY_NAME = data["PRIMARY_KEY_NAME"]
+    PRIMARY_KEY_NAME = data['PRIMARY_KEY_NAME']
 
     # retrieve
     test_PLURAL.retrieve_SINGULAR(client=client,

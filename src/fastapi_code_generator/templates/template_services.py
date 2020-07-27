@@ -1,8 +1,9 @@
 """This module is for implementing SINGULAR services.
-The Service class' job is to interface with the SINGULAR queries, and transform
-the result provided by the Quries class into Schemas.
-When creating an instance of Service() you shouldn't call `service._queries()`
-directly, hence why it's declared as private (_).
+
+The Service class' job is to interface with the SINGULAR queries, and
+transform the result provided by the Quries class into Schemas. When
+creating an instance of Service() you shouldn't call
+`service._queries()` directly, hence why it's declared as private (_).
 """
 
 from typing import List
@@ -16,11 +17,11 @@ from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
 
 
 class Service:
-    """Service.
-    """
+    """Service."""
 
     def __init__(self, queries: SINGULAR_queries.Queries):
         """__init__.
+
         Args:
             queries (SINGULAR_queries.Queries): queries
         """
@@ -29,6 +30,7 @@ class Service:
     async def create(self,
                      SINGULAR: SINGULAR_schemas.Create) -> SINGULAR_schemas.DB:
         """create.
+
         Args:
             SINGULAR (SINGULAR_schemas.Create): SINGULAR
         Returns:
@@ -40,6 +42,7 @@ class Service:
     async def get_by_id(
             self, PRIMARY_KEY_NAME: PRIMARY_KEY_TYPE) -> SINGULAR_schemas.DB:
         """Gets the SINGULAR that matches the provided PRIMARY_KEY_NAME.
+
         Args:
             PRIMARY_KEY_NAME (PRIMARY_KEY_TYPE): PRIMARY_KEY_NAME
         Returns:
@@ -57,6 +60,7 @@ class Service:
         page_size: pydantic.conint(ge=1, le=100),
     ) -> SINGULAR_schemas.Paginated:
         """Gets a paginated result list of PLURAL.
+
         Args:
             page (pydantic.conint(ge=1)): page
             page_size (pydantic.conint(ge=1, le=100)): page_size
@@ -77,6 +81,7 @@ class Service:
             self, PRIMARY_KEY_NAME: PRIMARY_KEY_TYPE,
             new_SINGULAR: SINGULAR_schemas.Update) -> SINGULAR_schemas.DB:
         """Updates an existing SINGULAR.
+
         Args:
             PRIMARY_KEY_NAME (PRIMARY_KEY_TYPE): PRIMARY_KEY_NAME
             new_SINGULAR (SINGULAR_schemas.Update): new_SINGULAR

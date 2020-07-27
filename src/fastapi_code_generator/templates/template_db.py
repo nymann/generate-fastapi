@@ -1,6 +1,4 @@
-"""Example Google style docstrings.
-
-"""
+"""Example Google style docstrings."""
 from PROJECT_NAME.core import config_loader
 from gino.ext import starlette  # pylint: disable=no-name-in-module
 from sqlalchemy.dialects.postgresql import UUID

@@ -22,7 +22,7 @@ class Queries():
                        page: int) -> Tuple[List[Model], int]:
         PLURAL: List[Model] = await Model.query.order_by(
             Model.PRIMARY_KEY_NAME.asc()).offset(page_size * (page - 1)
-                                                ).limit(page_size).gino.all()
+                                                 ).limit(page_size).gino.all()
 
         count = await DB.func.count(Model.PRIMARY_KEY_NAME).gino.scalar()
         return PLURAL, count
@@ -38,5 +38,5 @@ class Queries():
     async def update(self, old_SINGULAR: Model,
                      new_SINGULAR: UpdateSchema) -> Model:
         updated_SINGULAR = await old_SINGULAR.update(**new_SINGULAR.__dict__
-                                                    ).apply()
+                                                     ).apply()
         return updated_SINGULAR._instance
