@@ -5,10 +5,11 @@ current working directory.(This will change)
 import os
 import pathlib
 import shutil
+
 import typer
-from fastapi_code_generator.schemas import baseschemas
 
 import sql_column_parser
+from fastapi_code_generator.schemas import baseschemas
 from sql_column_parser import schemas
 
 
@@ -19,11 +20,16 @@ def mk_dir(*targetpaths):
         targetpath ([type]): [description]
     """
     for targetpath in targetpaths:
-        try:
-            os.mkdir(targetpath)
-        except OSError:
-            return
-        print('Created folder at: {0}'.format(targetpath))
+        if not os.path.isdir(targetpath):
+            try:
+                print('Created folder at: {0}'.format(targetpath))
+                os.mkdir(targetpath)
+            except OSError:
+                return
+        else:
+            print(
+                'Folder at: {0} already exists. Using existing folder instead.'
+                .format(targetpath))
 
 
 def get_primary_key(table: sql_column_parser.schemas.Table):
@@ -359,9 +365,16 @@ def gen_makefiles(templates_path, target_path, replacement_data):
         target_path ([type]): [description]
         replacement_data ([type]): [description]
     """
+
     template_make_folder = os.path.join(templates_path, 'template_make')
     make_folder = os.path.join(target_path, 'make')
-    shutil.copytree(template_make_folder, make_folder)
+
+    if os.path.isdir(make_folder):
+        print(
+            "\"make folder\" at {0} already exists. Keeping old make folder and files"
+            .format(make_folder))
+    else:
+        shutil.copytree(template_make_folder, make_folder)
 
     template_makefile_dir = os.path.join(templates_path, 'template_Makefile')
     makefile_dir = os.path.join(target_path, 'Makefile')
@@ -383,6 +396,12 @@ def gen_dirs_and_files(
         project_name ([type]): [description]
         gen_additional_files ([type]): [description]
     """
+    if not os.path.isdir(targetpath):
+        print(
+            "The target directory does not exist. Please try again with a different target path."
+        )
+        return
+
     templates_path = os.path.join(
         pathlib.Path(__file__).parent.absolute(),
         'templates',
@@ -391,6 +410,9 @@ def gen_dirs_and_files(
     table = get_table(sql_file)
 
     replacement_data = baseschemas.ReplacementData(project_name, table)
+
+    replacement_data['PRIMARY_KEY_TYPE'] = translate_sql_type_to_pytypes(
+        get_primary_key(table).col_type.name)
 
     # TODO(FIX ALL PATHS)
 
@@ -449,7 +471,7 @@ def translate_sql_type(type_name):
     """
     translate_dict = {
         'DATE': 'Date',
-        'TIMESTAMP': 'Datetime',
+        'TIMESTAMP': 'DateTime',
         'VARCHAR': 'String',
         'TEXT': 'String',
         'UUID': 'UUID',
@@ -577,8 +599,8 @@ def create_mock_data(table: sql_column_parser.schemas.Table,
         text.append(
             field_format.format(
                 column.name,
-                translate_sql_type_to_rand_data(column.col_type.name, ),
-            ), )
+                translate_sql_type_to_rand_data(column.col_type.name),
+            ))
     return ''.join(text)
 
 
@@ -601,7 +623,7 @@ def get_all_colnames_and_typenames_as_string(
             continue
         line = (field_format.format(
             column.name,
-            translate_sql_type_to_pytypes(column.col_type.name, ),
+            translate_sql_type_to_pytypes(column.col_type.name),
         ))
         declaration.append(line)
     return ''.join(declaration)
@@ -632,8 +654,7 @@ def get_model_declarations(table: sql_column_parser.schemas.Table):
             line.append(', primary_key={0}'.format(str(column.is_primary_key)))
         if column.col_type.default:
             line.append(
-                ', default=DB.Text(\"{0}\")".format(column.col_type.default)',
-            )
+                ", default=DB.Text(\"{0}\")".format(column.col_type.default), )
         if not column.col_type.nullable:
             line.append(', nullable={0}'.format(column.col_type.nullable))
 
@@ -650,13 +671,18 @@ def replace_in_file(src_file_path, target_file_path, replacement_data):
         target_file_path ([type]): [description]
         replacement_data ([type]): [description]
     """
-    lines = get_file_content(src_file_path)
 
-    with open(target_file_path, 'wt') as output_file:
-        for line in lines:
-            for word_to_replace, replacement_word in replacement_data.items():
-                line = line.replace(word_to_replace, replacement_word)
-            output_file.write(line)
+    if os.path.isfile(target_file_path):
+        print('File at {0} already exists. Keeping existing file'.format(
+            target_file_path))
+    else:
+        lines = get_file_content(src_file_path)
+        with open(target_file_path, 'wt') as output_file:
+            for line in lines:
+                for word_to_replace, replacement_word in replacement_data.replace_items(
+                ):
+                    line = line.replace(word_to_replace, replacement_word)
+                output_file.write(line)
 
 
 def get_file_content(src_file_path):

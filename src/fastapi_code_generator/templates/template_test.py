@@ -6,7 +6,6 @@ import uuid
 
 import pydantic
 import pytest
-
 from requests import exceptions
 
 BASE_ROUTE = '/PLURAL/'

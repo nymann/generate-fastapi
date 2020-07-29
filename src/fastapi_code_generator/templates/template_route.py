@@ -9,10 +9,9 @@ but nothing about the database.
 
 import pydantic
 
-from PROJECT_NAME.core import security
-from PROJECT_NAME.core import service_factory
-from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
 import fastapi
+from PROJECT_NAME.core import security, service_factory
+from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
 from starlette import status
 
 router = fastapi.APIRouter()

@@ -1,6 +1,7 @@
 """Builds boilerplate as a package."""
-import setuptools
 from distutils import util
+
+import setuptools
 
 version = dict()
 path = util.convert_path('src/PROJECT_NAME/core/version.py')

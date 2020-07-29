@@ -25,6 +25,8 @@ BASE_FIELDS
 class Create(_Base):
     """Create schema is used for validating POST requests."""
 
+class Update(_Base):
+    """Update schema is used for validating POST requests."""
 
 class DB(_Base):
     """DB schema is used for transforming an ORM model to a pydantic model."""

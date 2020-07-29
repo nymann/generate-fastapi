@@ -1,12 +1,10 @@
 import datetime
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
 import pydantic
 
 from PROJECT_NAME.core.db import DB
-from PROJECT_NAME.domain.PLURAL import SINGULAR_model
-from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
+from PROJECT_NAME.domain.PLURAL import SINGULAR_model, SINGULAR_schemas
 
 CreateSchema = SINGULAR_schemas.Create
 UpdateSchema = SINGULAR_schemas.Update
