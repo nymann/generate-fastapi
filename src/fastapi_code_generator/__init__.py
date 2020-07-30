@@ -7,9 +7,8 @@ import pathlib
 import shutil
 from os import replace
 
-import typer
-
 import sql_column_parser
+import typer
 from fastapi_code_generator.file_generators.fastapi_generator import \
     FastApiGenerator
 from fastapi_code_generator.schemas import baseschemas
@@ -65,7 +64,7 @@ def mk_folder_structure(targetpath, project_dir, plural_name):
         project_dir ([type]): [description]
         plural_name ([type]): [description]
     """
-    mk_dir(
+    FastApiGenerator.mk_dir(
         '{0}/src'.format(targetpath),
         project_dir,
         '{0}/core'.format(project_dir),
@@ -96,6 +95,12 @@ def gen_src_files(
                                     replacement_data)
 
     FastApiGenerator.gen_db_file(templates_path, project_dir, replacement_data)
+
+    FastApiGenerator.gen_config_loader_file(
+        templates_path,
+        project_dir,
+        replacement_data,
+    )
 
     FastApiGenerator.gen_services_file(
         templates_path,
@@ -128,6 +133,12 @@ def gen_src_files(
         project_dir,
         plural_name,
         singular_name,
+        replacement_data,
+    )
+
+    FastApiGenerator.gen_project_init_file(
+        templates_path,
+        project_dir,
         replacement_data,
     )
 

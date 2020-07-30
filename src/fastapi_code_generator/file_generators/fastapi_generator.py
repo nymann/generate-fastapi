@@ -1,11 +1,30 @@
 import os
 import shutil
+from os import mkdir
 
 import sql_column_parser
 from fastapi_code_generator.translators.sql_translator import SqlTranslator
 
 
 class FastApiGenerator:
+    def mk_dir(*targetpaths):
+        """mk_dir.
+
+        Args:
+            targetpath ([type]): [description]
+        """
+        for targetpath in targetpaths:
+            if not os.path.isdir(targetpath):
+                try:
+                    print('Created folder at: {0}'.format(targetpath))
+                    os.mkdir(targetpath)
+                except OSError:
+                    return
+            else:
+                print(
+                    'Folder at: {0} already exists. Using existing folder instead.'
+                    .format(targetpath))
+
     def gen_route_file(templates_path, project_dir, plural_name,
                        replacement_data):
         """gen_route_file.
@@ -19,7 +38,7 @@ class FastApiGenerator:
         template_route_dir = os.path.join(templates_path, 'template_route.py')
         replace_in_file(
             template_route_dir,
-            '{0}/routers/{1}.py'.format(
+            '{0}/routers/{1}_router.py'.format(
                 project_dir,
                 plural_name,
             ),
@@ -185,6 +204,12 @@ class FastApiGenerator:
         target = '{0}/conftest.py'.format(tests_dir)
         replace_in_file(src, target, replacement_data)
 
+    def gen_project_init_file(templates_path, project_dir, replacement_data):
+        template_project_init = os.path.join(templates_path,
+                                             'template_project_init.py')
+        project_init = os.path.join(project_dir, '__init__.py')
+        replace_in_file(template_project_init, project_init, replacement_data)
+
     def gen_db_file(templates_path, project_dir, replacement_data):
         """gen_db_file.
 
@@ -197,6 +222,22 @@ class FastApiGenerator:
         replace_in_file(
             template_db_dir,
             '{0}/core/db.py'.format(project_dir),
+            replacement_data,
+        )
+
+    def gen_config_loader_file(templates_path, project_dir, replacement_data):
+        """gen_db_file.
+
+        Args:
+            templates_path ([type]): [description]
+            project_dir ([type]): [description]
+            replacement_data ([type]): [description]
+        """
+        template_db_dir = os.path.join(templates_path,
+                                       'template_config_loader.py')
+        replace_in_file(
+            template_db_dir,
+            '{0}/core/config_loader.py'.format(project_dir),
             replacement_data,
         )
 
@@ -229,22 +270,37 @@ class FastApiGenerator:
             target_path ([type]): [description]
             replacement_data ([type]): [description]
         """
-
         template_make_folder = os.path.join(templates_path, 'template_make')
         make_folder = os.path.join(target_path, 'make')
 
         if os.path.isdir(make_folder):
             print(
-                "\"make folder\" at {0} already exists. Keeping old make folder and files"
-                .format(make_folder))
+                '\"make folder\" at {0} already exists. Keeping old make folder and files'
+                .format(make_folder), )
         else:
-            shutil.copytree(template_make_folder, make_folder)
+            mkdir(make_folder)
+            for filename in os.listdir(template_make_folder):
+                from_path = os.path.join(template_make_folder, filename)
+                to_path = os.path.join(make_folder, filename)
+                replace_in_file(from_path, to_path, replacement_data)
 
-        template_makefile_dir = os.path.join(templates_path,
-                                             'template_Makefile')
+        template_makefile_dir = os.path.join(
+            templates_path,
+            'template_Makefile',
+        )
         makefile_dir = os.path.join(target_path, 'Makefile')
 
         replace_in_file(template_makefile_dir, makefile_dir, replacement_data)
+
+        scripts_folder = os.path.join(target_path, 'scripts')
+        mkdir(scripts_folder)
+
+        template_requirements_parser = os.path.join(
+            templates_path, 'template_requirements_parser.py')
+        requirements_parser = os.path.join(scripts_folder,
+                                           'requirements_parser.py')
+        replace_in_file(template_requirements_parser, requirements_parser,
+                        replacement_data)
 
 
 def replace_in_file(src_file_path, target_file_path, replacement_data):
@@ -255,17 +311,15 @@ def replace_in_file(src_file_path, target_file_path, replacement_data):
         target_file_path ([type]): [description]
         replacement_data ([type]): [description]
     """
-
     if os.path.isfile(target_file_path):
         print('File at {0} already exists. Keeping existing file'.format(
-            target_file_path))
+            target_file_path, ))
     else:
         lines = get_file_content(src_file_path)
         with open(target_file_path, 'wt') as output_file:
             for line in lines:
-                for word_to_replace, replacement_word in replacement_data.replace_items(
-                ):
-                    line = line.replace(word_to_replace, replacement_word)
+                for key, replacement in replacement_data.replace_items():
+                    line = line.replace(key, replacement)
                 output_file.write(line)
 
 
@@ -309,7 +363,7 @@ def get_model_declarations(table: sql_column_parser.schemas.Table):
             line.append(', primary_key={0}'.format(str(column.is_primary_key)))
         if column.col_type.default:
             line.append(
-                ", default=DB.Text(\"{0}\")".format(column.col_type.default), )
+                ', default=DB.Text(\"{0}\")'.format(column.col_type.default), )
         if not column.col_type.nullable:
             line.append(', nullable={0}'.format(column.col_type.nullable))
 

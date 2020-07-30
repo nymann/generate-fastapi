@@ -3,10 +3,10 @@ import pathlib
 import subprocess
 import sys
 
-import pytest
+from fastapi import testclient
 
 import PROJECT_NAME
-from fastapi import testclient
+import pytest
 
 
 @pytest.fixture

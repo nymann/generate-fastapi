@@ -1,0 +1,45 @@
+"""Collection of functions initializing FastAPI application.
+
+This is the main entry point, of creating the FastAPI application. The
+application gets created, then gets extensions initialized and routes
+registered.
+"""
+
+from fastapi import FastAPI
+
+from PROJECT_NAME.core import version
+from PROJECT_NAME.core.db import DB
+from PROJECT_NAME.routers import PLURAL_router
+
+
+def create_app() -> FastAPI:
+    """Main entry point for creating application
+
+    Returns:
+        FastAPI: An instance of fastAPI application.
+    """
+    app: FastAPI = FastAPI(title="PROJECT_NAME", version=version.__version__)
+    _initalize_extensions(app=app)
+    return _register_routes(app=app)
+
+
+def _register_routes(app: FastAPI) -> FastAPI:
+    """Registers routes on the application
+
+    Args:
+        app (FastAPI): FastAPI application
+
+    Returns:
+        FastAPI: FastAPI application with routes registered.
+    """
+    app.include_router(PLURAL_router.router, tags=["PLURAL"], prefix="/PLURAL")
+    return app
+
+
+def _initalize_extensions(app: FastAPI):
+    """Initializes extensions such as database
+
+    Args:
+        app (FastAPI): FastAPI application
+    """
+    DB.init_app(app=app)

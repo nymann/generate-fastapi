@@ -7,12 +7,12 @@ the controller only knows which methods it can call in SINGULAR Service
 but nothing about the database.
 """
 
-import pydantic
-
 import fastapi
+import pydantic
+from starlette import status
+
 from PROJECT_NAME.core import security, service_factory
 from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
-from starlette import status
 
 router = fastapi.APIRouter()
 
