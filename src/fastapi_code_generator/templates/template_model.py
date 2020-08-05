@@ -2,7 +2,9 @@ from PROJECT_NAME.core.db import DB
 
 
 class Model(DB.Model):
-    """Model. TODO(Add DOC)
+    """Model.
+
+    TODO(Add DOC)
     """
 
-    __tablename__ = "PLURAL"
+    __tablename__ = 'PLURAL'

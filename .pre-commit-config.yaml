@@ -3,16 +3,25 @@ repos:
     rev: v3.1.0
     hooks:
     -   id: trailing-whitespace
+        exclude: /templates/
     -   id: check-merge-conflict
+        exclude: /templates/
     -   id: check-yaml
+        exclude: /templates/
     -   id: trailing-whitespace
+        exclude: /templates/
     -   id: no-commit-to-branch
+        exclude: /templates/
     -   id: mixed-line-ending
+        exclude: /templates/
     -   id: end-of-file-fixer
+        exclude: /templates/
     -   id: fix-encoding-pragma
+        exclude: /templates/
         args: ['--remove']
 
 -   repo: https://github.com/pre-commit/mirrors-yapf
     rev: ''  # Use the sha / tag you want to point at
     hooks:
     -   id: yapf
+        exclude: /templates/

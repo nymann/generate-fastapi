@@ -1,12 +1,10 @@
 import datetime
-from typing import List
-from typing import Tuple
+from typing import List, Tuple
 
 import pydantic
 
 from PROJECT_NAME.core.db import DB
-from PROJECT_NAME.domain.PLURAL import SINGULAR_model
-from PROJECT_NAME.domain.PLURAL import SINGULAR_schemas
+from PROJECT_NAME.domain.PLURAL import SINGULAR_model, SINGULAR_schemas
 
 CreateSchema = SINGULAR_schemas.Create
 UpdateSchema = SINGULAR_schemas.Update
@@ -22,7 +20,7 @@ class Queries():
                        page: int) -> Tuple[List[Model], int]:
         PLURAL: List[Model] = await Model.query.order_by(
             Model.PRIMARY_KEY_NAME.asc()).offset(page_size * (page - 1)
-                                                ).limit(page_size).gino.all()
+                                                 ).limit(page_size).gino.all()
 
         count = await DB.func.count(Model.PRIMARY_KEY_NAME).gino.scalar()
         return PLURAL, count
@@ -38,5 +36,5 @@ class Queries():
     async def update(self, old_SINGULAR: Model,
                      new_SINGULAR: UpdateSchema) -> Model:
         updated_SINGULAR = await old_SINGULAR.update(**new_SINGULAR.__dict__
-                                                    ).apply()
+                                                     ).apply()
         return updated_SINGULAR._instance

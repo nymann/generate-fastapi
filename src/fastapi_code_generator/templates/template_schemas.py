@@ -1,8 +1,7 @@
 """This module is for schemas related to PLURAL.
 
-These schemas are used for creating new instances of SINGULAR. Returning paginated
-result (`Paginated`) and transforming a SINGULAR
-
+These schemas are used for creating new instances of SINGULAR. Returning
+paginated result (`Paginated`) and transforming a SINGULAR
 """
 import datetime
 from typing import List
@@ -24,19 +23,18 @@ BASE_FIELDS
 
 
 class Create(_Base):
-    """Create schema is used for validating POST requests.
-    """
+    """Create schema is used for validating POST requests."""
 
+class Update(_Base):
+    """Update schema is used for validating POST requests."""
 
 class DB(_Base):
-    """DB schema is used for transforming an ORM model to a pydantic model.
-    """
+    """DB schema is used for transforming an ORM model to a pydantic model."""
 
     PRIMARY_KEY_NAME: PRIMARY_KEY_TYPE
 
     class Config:
-        """We set orm_mode to True to allow transforming the ORM model.
-        """
+        """We set orm_mode to True to allow transforming the ORM model."""
 
         orm_mode = True
 
