@@ -1,16 +1,20 @@
-"""This module is for schemas related to PLURAL.
+"""This module is for schemas related to ${model.names.plural_name}.
 
-These schemas are used for creating new instances of SINGULAR. Returning
-paginated result (`Paginated`) and transforming a SINGULAR
+These schemas are used for creating new instances of ${model.names.singular_name}. Returning
+paginated result (`Paginated`) and transforming a ${model.names.singular_name}
+
 """
 import datetime
+from dataclasses import field
+from os import name
 from typing import List
 from xml.etree import ElementTree as ET
 
 import pydantic
 
-from PROJECT_NAME.domain import base_schemas
+from ${PROJECT_NAME}.domain import base_schemas
 
+<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
 
 class _Base(pydantic.BaseModel):
     """Used as baseclass for all other schemas inside this module.
@@ -18,8 +22,11 @@ class _Base(pydantic.BaseModel):
     The base schema is kept private (by leftpadding with `_`).
     """
 
-
-BASE_FIELDS
+% for field in model.fields:
+    % if not field.is_primary_key:
+    ${field.name}: ${JsonTranslator.translate_typename_to_pytypes(field.type.name)}
+    % endif
+% endfor
 
 
 class Create(_Base):
@@ -31,7 +38,7 @@ class Update(_Base):
 class DB(_Base):
     """DB schema is used for transforming an ORM model to a pydantic model."""
 
-    PRIMARY_KEY_NAME: PRIMARY_KEY_TYPE
+    ${PRIMARY_KEY_NAME}: ${PRIMARY_KEY_TYPE}
 
     class Config:
         """We set orm_mode to True to allow transforming the ORM model."""

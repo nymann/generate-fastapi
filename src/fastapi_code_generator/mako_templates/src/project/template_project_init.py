@@ -6,11 +6,14 @@ registered.
 """
 
 from fastapi import FastAPI
+from requests import models
 
-from PROJECT_NAME.core import version
-from PROJECT_NAME.core.db import DB
-from PROJECT_NAME.routers import PLURAL_router
+from ${PROJECT_NAME}.core import version
+from ${PROJECT_NAME}.core.db import DB
+from ${PROJECT_NAME}.routers import ${model.names.plural_name}_router
 
+% for model in models:
+% endfor
 
 def create_app() -> FastAPI:
     """Main entry point for creating application
@@ -18,7 +21,7 @@ def create_app() -> FastAPI:
     Returns:
         FastAPI: An instance of fastAPI application.
     """
-    app: FastAPI = FastAPI(title="PROJECT_NAME", version=version.__version__)
+    app: FastAPI = FastAPI(title="${PROJECT_NAME}", version=version.__version__)
     _initalize_extensions(app=app)
     return _register_routes(app=app)
 
@@ -32,7 +35,10 @@ def _register_routes(app: FastAPI) -> FastAPI:
     Returns:
         FastAPI: FastAPI application with routes registered.
     """
-    app.include_router(PLURAL_router.router, tags=["PLURAL"], prefix="/PLURAL")
+    % for model in models:
+    app.include_router(${model.names.plural_name}_router.router, tags=["${model.names.plural_name}"], prefix="/${model.names.plural_name}")
+    % endfor
+
     return app
 
 

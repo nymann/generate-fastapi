@@ -31,7 +31,6 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 
 lint:
 	@pip install yapf pylint 'isort<5.0'
-	@yapf --exclude '**/template_*.py' --style google -dpr src tests
 	@pylint --rcfile=setup.cfg -r n src tests > pylint.txt
 
 install: ${VERSION}
@@ -41,11 +40,7 @@ test: install
 	@python3 setup.py test
 
 fix: hooks
-	@pip install yapf pylint 'isort<5.0'
-	@isort --recursive src tests
-	@yapf --exclude '**/template_*.py' --style google -dpr src tests
-	@pylint --rcfile=setup.cfg src tests
-
+	@autopep8 -ir src tests
 clean:
 	@find src tests | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 	@rm -rf \

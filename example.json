@@ -1,0 +1,62 @@
+{
+    "models":
+        {
+            "user": {
+                "fields": [
+                    {
+                        "name": "identifier",
+                        "type": {
+                            "name":"uuid"
+                        },
+                        "is_primary_key": true,
+                        "required":true
+                    },
+                    {
+                        "name": "email",
+                        "type": {
+                            "name":"string",
+                            "max_length": 260,
+                            "min_length": 100
+                        },
+                        "required": false
+                    },
+                    {
+                        "name": "name",
+                        "type": {
+                            "name":"string"
+                        },
+                        "required": false
+                    },
+                    {
+                        "name": "registration_date",
+                        "type": {
+                            "name":"date"
+                        }
+                    }
+                ],
+                "routes": [
+                    {
+                        "name": "GetList",
+                        "include": true
+                    },
+                    {
+                        "name": "GetById",
+                        "include": true
+                    },
+                    {
+                        "name": "Post",
+                        "include": true
+                    },
+                    {
+                        "name": "Update",
+                        "include": true
+                    },
+                    {
+                        "name": "DeleteById",
+                        "include": true
+                    }
+                ]
+            }
+        }
+
+}

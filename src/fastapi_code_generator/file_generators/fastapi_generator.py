@@ -2,344 +2,203 @@ import os
 import shutil
 from os import mkdir
 
-import sql_column_parser
-from fastapi_code_generator.translators.sql_translator import SqlTranslator
+from mako.runtime import Context
+from mako.template import Template
+from requests import models
+
+from fastapi_code_generator.schemas import baseschemas
+from fastapi_code_generator.translators.json_translator import JsonTranslator
 
 
 class FastApiGenerator:
-    def mk_dir(*targetpaths):
-        """mk_dir.
+    def gen_api_files(models, templates_path, target_path, project_name):
+        project_dir = '{0}/src/{1}'.format(target_path, project_name)
+        _mk_folder_structure(target_path, project_dir, models)
 
-        Args:
-            targetpath ([type]): [description]
-        """
-        for targetpath in targetpaths:
-            if not os.path.isdir(targetpath):
-                try:
-                    print('Created folder at: {0}'.format(targetpath))
-                    os.mkdir(targetpath)
-                except OSError:
-                    return
-            else:
-                print(
-                    'Folder at: {0} already exists. Using existing folder instead.'
-                    .format(targetpath))
+        for model in models:
+            _gen_model_route_file(model, templates_path, target_path,
+                                  project_name)
+            _gen_model_domain_files(model, templates_path, target_path,
+                                    project_name)
+            _gen_model_test_files(model, templates_path, target_path,
+                                  project_name)
 
-    def gen_route_file(templates_path, project_dir, plural_name,
-                       replacement_data):
-        """gen_route_file.
+        _gen_test_file(models, templates_path, target_path, project_name)
+        _gen_common_project_files(models, templates_path, target_path,
+                                  project_name)
 
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            plural_name ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_route_dir = os.path.join(templates_path, 'template_route.py')
-        replace_in_file(
-            template_route_dir,
-            '{0}/routers/{1}_router.py'.format(
-                project_dir,
-                plural_name,
-            ),
-            replacement_data,
-        )
 
-    def gen_services_file(
-        templates_path,
+def _gen_model_file(model, template_path, target_path, project_name):
+    template = Template(filename=template_path)
+
+    primary_key = _get_primary_key(model)
+
+    content = template.render(
+        model=model,
+        PRIMARY_KEY_TYPE=JsonTranslator.translate_typename_to_pytypes(
+            primary_key.type.name),
+        PRIMARY_KEY_NAME=primary_key.name,
+        PROJECT_NAME=project_name)
+
+    with open(target_path, "w") as file:
+        file.write(content)
+
+
+def _gen_common_project_files(models, templates_path, target_path,
+                              project_name):
+    project_dir = '{0}/src/{1}'.format(target_path, project_name)
+
+    template_service_factory_dir = '{0}/src/project/core/service_factory.py'.format(
+        templates_path)
+    service_factory_dir = '{0}/core/service_factory.py'.format(project_dir)
+
+    _gen_file(template_service_factory_dir, service_factory_dir, project_name,
+              models)
+
+    template_base_schemas_dir = '{0}/src/project/domain/template_base_schemas.py'.format(
+        templates_path)
+    base_schemas_dir = '{0}/domain/base_schemas.py'.format(project_dir)
+
+    _gen_file(template_base_schemas_dir, base_schemas_dir, project_name,
+              models)
+
+    template_project_init = '{0}/src/project/template_project_init.py'.format(
+        templates_path)
+    project_init = '{0}/__init__.py'.format(project_dir)
+
+    _gen_file(template_project_init, project_init, project_name, models)
+
+
+def _gen_test_file(models, templates_path, target_path, project_name):
+    template_tests_util_dir = '{0}/tests/utils.py'.format(templates_path)
+    tests_utils_dir = '{0}/tests/utils.py'.format(target_path)
+
+    _gen_file(template_tests_util_dir, tests_utils_dir, project_name, models)
+
+    template_conftest_dir = '{0}/tests/conftest.py'.format(templates_path)
+    conftest_dir = '{0}/tests/conftest.py'.format(target_path)
+
+    _gen_file(template_conftest_dir, conftest_dir, project_name, models)
+
+
+def _gen_model_test_files(model, templates_path, target_path, project_name):
+    template_tests_route_init_dir = '{0}/tests/test_route/__init__.py'.format(
+        templates_path)
+    tests_route_init_dir = '{0}/tests/test_{1}/__init__.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_tests_route_init_dir, tests_route_init_dir,
+                    project_name)
+
+    template_test_bp_dir = '{0}/tests/test_route/test_basic_positive.py'.format(
+        templates_path)
+    test_bp_dir = '{0}/tests/test_{1}/test_basic_positive.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_test_bp_dir, test_bp_dir, project_name)
+
+    template_test_iin_dir = '{0}/tests/test_route/test_invalid_input_negative.py'.format(
+        templates_path)
+    test_iin_dir = '{0}/tests/test_{1}/test_invalid_input_negative.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_test_iin_dir, test_iin_dir, project_name)
+
+    template_test_vin_dir = '{0}/tests/test_route/test_valid_input_negative.py'.format(
+        templates_path)
+    test_vin_dir = '{0}/tests/test_{1}/test_valid_input_negative.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_test_vin_dir, test_vin_dir, project_name)
+
+    template_test_ep_dir = '{0}/tests/test_route/test_extended_positive.py'.format(
+        templates_path)
+    test_ep_dir = '{0}/tests/test_{1}/test_extended_positive.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_test_ep_dir, test_ep_dir, project_name)
+
+    template_test_dest_dir = '{0}/tests/test_route/test_destructive.py'.format(
+        templates_path)
+    test_dest_dir = '{0}/tests/test_{1}/test_destructive.py'.format(
+        target_path, model.names.plural_name)
+
+    _gen_model_file(model, template_test_dest_dir, test_dest_dir, project_name)
+
+
+def _gen_model_route_file(model, templates_path, target_path, project_name):
+    project_dir = '{0}/src/{1}'.format(target_path, project_name)
+
+    template_routers_dir = '{0}/src/project/routers/template_route.py'.format(
+        templates_path)
+
+    routers_dir = '{0}/routers/{1}_route.py'.format(
         project_dir,
-        plural_name,
-        singular_name,
-        replacement_data,
-    ):
-        """gen_services_file.
+        model.names.plural_name,
+    )
 
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            plural_name ([type]): [description]
-            singular_name ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_services_dir = os.path.join(
-            templates_path,
-            'template_services.py',
-        )
+    _gen_model_file(model, template_routers_dir, routers_dir, project_name)
 
-        services_dir = '{0}/domain/{1}/{2}_services.py'.format(
-            project_dir,
-            plural_name,
-            singular_name,
-        )
 
-        replace_in_file(template_services_dir, services_dir, replacement_data)
+def _gen_model_domain_files(model, templates_path, target_path, project_name):
+    project_dir = '{0}/src/{1}'.format(target_path, project_name)
 
-    def gen_queries_file(
-        templates_path,
+    template_services_dir = '{0}/src/project/domain/model/template_services.py'.format(
+        templates_path)
+
+    services_dir = '{0}/domain/{1}/{2}_services.py'.format(
         project_dir,
-        plural_name,
-        singular_name,
-        replacement_data,
-    ):
-        """gen_queries_file.
+        model.names.plural_name,
+        model.names.singular_name,
+    )
 
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            plural_name ([type]): [description]
-            singular_name ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_queries_dir = os.path.join(templates_path,
-                                            'template_queries.py')
+    _gen_model_file(model, template_services_dir, services_dir, project_name)
 
-        queries_dir = ('{0}/domain/{1}/{2}_queries.py'.format(
-            project_dir,
-            plural_name,
-            singular_name,
-        ))
+    template_queries_dir = '{0}/src/project/domain/model/template_queries.py'.format(
+        templates_path)
 
-        replace_in_file(template_queries_dir, queries_dir, replacement_data)
-
-    def gen_base_schemas_file(templates_path, project_dir, replacement_data):
-        """gen_base_schemas_file.
-
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_base_schemas_dir = os.path.join(
-            templates_path,
-            'template_base_schemas.py',
-        )
-        base_schemas_dir = '{0}/domain/base_schemas.py'.format(project_dir)
-        replace_in_file(
-            template_base_schemas_dir,
-            base_schemas_dir,
-            replacement_data,
-        )
-
-    def gen_model_file(
-        templates_path,
+    queries_dir = ('{0}/domain/{1}/{2}_queries.py'.format(
         project_dir,
-        replacement_data,
-        table,
-    ):
-        """gen_model_file.
+        model.names.plural_name,
+        model.names.singular_name,
+    ))
 
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            replacement_data ([type]): [description]
-            table ([type]): [description]
-        """
-        singular_name = table.names.singular_name
-        plural_name = table.names.plural_name
+    _gen_model_file(model, template_queries_dir, queries_dir, project_name)
 
-        template_model_dir = os.path.join(templates_path, 'template_model.py')
-        model_dir = '{0}/domain/{1}/{2}_model.py'.format(
-            project_dir,
-            plural_name,
-            singular_name,
-        )
+    template_model_dir = '{0}/src/project/domain/model/template_model.py'.format(
+        templates_path)
 
-        replace_in_file(template_model_dir, model_dir, replacement_data)
-        with open(model_dir, 'a') as model_file:
-            model_file.write('\n')
-            model_file.write(get_model_declarations(table))
-
-    def gen_schemas_file(
-        templates_path,
+    model_dir = '{0}/domain/{1}/{2}_model.py'.format(
         project_dir,
-        plural_name,
-        singular_name,
-        replacement_data,
-    ):
-        """gen_schemas_file.
+        model.names.plural_name,
+        model.names.singular_name,
+    )
 
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            plural_name ([type]): [description]
-            singular_name ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_schemas_dir = os.path.join(templates_path,
-                                            'template_schemas.py')
+    _gen_model_file(model, template_model_dir, model_dir, project_name)
 
-        schemas_dir = ('{0}/domain/{1}/{2}_schemas.py'.format(
-            project_dir,
-            plural_name,
-            singular_name,
-        ))
-        replace_in_file(template_schemas_dir, schemas_dir, replacement_data)
+    template_schemas_dir = '{0}/src/project/domain/model/template_schemas.py'.format(
+        templates_path)
 
-    def gen_test_files(templates_path, targetpath, table, replacement_data):
-        """gen_test_files.
+    schemas_dir = ('{0}/domain/{1}/{2}_schemas.py'.format(
+        project_dir,
+        model.names.plural_name,
+        model.names.singular_name,
+    ))
 
-        Args:
-            templates_path ([type]): [description]
-            targetpath ([type]): [description]
-            table ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        tests_dir = '{0}/tests'.format(targetpath)
-
-        src = os.path.join(templates_path, 'template_test.py')
-        target = '{0}/test_{1}.py'.format(tests_dir, table.names.plural_name)
-        replace_in_file(src, target, replacement_data)
-
-        src = os.path.join(
-            templates_path,
-            'template_test_crud.py',
-        )
-        target = '{0}/test_crud.py'.format(tests_dir)
-        replace_in_file(src, target, replacement_data)
-
-        src = os.path.join(
-            templates_path,
-            'template_conftest.py',
-        )
-        target = '{0}/conftest.py'.format(tests_dir)
-        replace_in_file(src, target, replacement_data)
-
-    def gen_project_init_file(templates_path, project_dir, replacement_data):
-        template_project_init = os.path.join(templates_path,
-                                             'template_project_init.py')
-        project_init = os.path.join(project_dir, '__init__.py')
-        replace_in_file(template_project_init, project_init, replacement_data)
-
-    def gen_db_file(templates_path, project_dir, replacement_data):
-        """gen_db_file.
-
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_db_dir = os.path.join(templates_path, 'template_db.py')
-        replace_in_file(
-            template_db_dir,
-            '{0}/core/db.py'.format(project_dir),
-            replacement_data,
-        )
-
-    def gen_config_loader_file(templates_path, project_dir, replacement_data):
-        """gen_db_file.
-
-        Args:
-            templates_path ([type]): [description]
-            project_dir ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_db_dir = os.path.join(templates_path,
-                                       'template_config_loader.py')
-        replace_in_file(
-            template_db_dir,
-            '{0}/core/config_loader.py'.format(project_dir),
-            replacement_data,
-        )
-
-    def gen_setup_files(templates_path, target_path, replacement_data):
-        """gen_setup_files.
-
-        Args:
-            templates_path ([type]): [description]
-            target_path ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_setup_cfg_dir = os.path.join(templates_path,
-                                              'template_setup.cfg')
-        setup_cfg_dir = os.path.join(target_path, 'setup.cfg')
-
-        replace_in_file(template_setup_cfg_dir, setup_cfg_dir,
-                        replacement_data)
-
-        template_setup_py_dir = os.path.join(templates_path,
-                                             'template_setup.py')
-        setup_py_dir = os.path.join(target_path, 'setup.py')
-
-        replace_in_file(template_setup_py_dir, setup_py_dir, replacement_data)
-
-    def gen_makefiles(templates_path, target_path, replacement_data):
-        """gen_makefiles.
-
-        Args:
-            templates_path ([type]): [description]
-            target_path ([type]): [description]
-            replacement_data ([type]): [description]
-        """
-        template_make_folder = os.path.join(templates_path, 'template_make')
-        make_folder = os.path.join(target_path, 'make')
-
-        if os.path.isdir(make_folder):
-            print(
-                '\"make folder\" at {0} already exists. Keeping old make folder and files'
-                .format(make_folder), )
-        else:
-            mkdir(make_folder)
-            for filename in os.listdir(template_make_folder):
-                from_path = os.path.join(template_make_folder, filename)
-                to_path = os.path.join(make_folder, filename)
-                replace_in_file(from_path, to_path, replacement_data)
-
-        template_makefile_dir = os.path.join(
-            templates_path,
-            'template_Makefile',
-        )
-        makefile_dir = os.path.join(target_path, 'Makefile')
-
-        replace_in_file(template_makefile_dir, makefile_dir, replacement_data)
-
-        scripts_folder = os.path.join(target_path, 'scripts')
-        mkdir(scripts_folder)
-
-        template_requirements_parser = os.path.join(
-            templates_path, 'template_requirements_parser.py')
-        requirements_parser = os.path.join(scripts_folder,
-                                           'requirements_parser.py')
-        replace_in_file(template_requirements_parser, requirements_parser,
-                        replacement_data)
+    _gen_model_file(model, template_schemas_dir, schemas_dir, project_name)
 
 
-def replace_in_file(src_file_path, target_file_path, replacement_data):
-    """replace_in_file [summary].
+def _gen_file(template_path, target_path, project_name, models):
+    template = Template(filename=template_path)
 
-    Args:
-        src_file_path ([type]): [description]
-        target_file_path ([type]): [description]
-        replacement_data ([type]): [description]
-    """
-    if os.path.isfile(target_file_path):
-        print('File at {0} already exists. Keeping existing file'.format(
-            target_file_path, ))
-    else:
-        lines = get_file_content(src_file_path)
-        with open(target_file_path, 'wt') as output_file:
-            for line in lines:
-                for key, replacement in replacement_data.replace_items():
-                    line = line.replace(key, replacement)
-                output_file.write(line)
+    content = template.render(PROJECT_NAME=project_name, models=models)
+
+    with open(target_path, "w") as file:
+        file.write(content)
 
 
-def get_file_content(src_file_path):
-    """get_file_content.
-
-    Args:
-        src_file_path ([type]): [description]
-
-    Returns:
-        [type]: [description]
-    """
-    lines = []
-    with open(src_file_path, 'rt') as input_file:
-        lines = input_file.readlines()
-    return lines
-
-
-def get_model_declarations(table: sql_column_parser.schemas.Table):
-    """get_model_declarations [summary].
+def _get_primary_key(model: baseschemas.Model):
+    """get_primary_key.
 
     Args:
         table (sql_column_parser.schemas.Table): [description]
@@ -347,26 +206,56 @@ def get_model_declarations(table: sql_column_parser.schemas.Table):
     Returns:
         [type]: [description]
     """
-    declaration = []
-    for column in table.columns:
-        line = [
-            '\t{0} = DB.Column(DB.{1}'.format(
-                column.name,
-                SqlTranslator.translate_sql_type(column.col_type.name),
-            ),
-        ]
-        if column.col_type.max_bytesize:
-            line.append('({0})'.format(column.col_type.max_bytesize))
-        else:
-            line.append('()')
-        if column.is_primary_key:
-            line.append(', primary_key={0}'.format(str(column.is_primary_key)))
-        if column.col_type.default:
-            line.append(
-                ', default=DB.Text(\"{0}\")'.format(column.col_type.default), )
-        if not column.col_type.nullable:
-            line.append(', nullable={0}'.format(column.col_type.nullable))
+    possible_keys = []
+    preferred_types = ['uuid', 'interger']
+    for field in model.fields:
+        if field.is_primary_key:
+            if field.type.name in preferred_types:
+                return field
+            else:
+                possible_keys.append(field)
 
-        line.append(')')
-        declaration.append('{0}\n'.format(''.join(line)))
-    return ''.join(declaration)
+    return possible_keys[0]
+
+
+def _mk_folder_structure(target_path, project_dir, models):
+    """mk_folder_structure.
+
+        Args:
+            target_path ([type]): [description]
+            project_dir ([type]): [description]
+            plural_name ([type]): [description]
+        """
+    _mk_dir(
+        '{0}/src'.format(target_path),
+        project_dir,
+        '{0}/core'.format(project_dir),
+        '{0}/domain'.format(project_dir),
+        '{0}/routers'.format(project_dir),
+        '{0}/tests'.format(target_path),
+    )
+
+    for model in models:
+        _mk_dir(
+            '{0}/domain/{1}'.format(project_dir, model.names.plural_name),
+            '{0}/tests/test_{1}'.format(target_path, model.names.plural_name),
+        )
+
+
+def _mk_dir(*target_paths):
+    """mk_dir.
+
+        Args:
+            target_path ([type]): [description]
+        """
+    for target_path in target_paths:
+        if not os.path.exists(target_path):
+            try:
+                print('Created folder at: {0}'.format(target_path))
+                os.mkdir(target_path)
+            except OSError:
+                return
+        else:
+            print(
+                'Folder at: {0} already exists. Using existing folder instead.'
+                .format(target_path))
