@@ -17,7 +17,7 @@ from ${PROJECT_NAME}.domain.${model.names.plural_name} import (
 
 router = fastapi.APIRouter()
 
-
+% if any(route.name == 'GetList' and route.include for route in model.routes):
 @router.get('/', response_model=${model.names.singular_name}_schemas.Paginated)
 async def get_${model.names.plural_name}(page_size: pydantic.conint(ge=1, le=100) = 20,
                      page: pydantic.conint(ge=1) = 1,
@@ -32,8 +32,9 @@ async def get_${model.names.plural_name}(page_size: pydantic.conint(ge=1, le=100
         service:
     """
     return await service.get_list(page=page, page_size=page_size)
+%endif
 
-
+% if any((route.name == 'Post' and route.include) for route in model.routes):
 @router.post('/',
              response_model=${model.names.singular_name}_schemas.DB,
              status_code=status.HTTP_201_CREATED)
@@ -47,8 +48,9 @@ async def add_${model.names.singular_name}(${model.names.singular_name}: ${model
         ${model.names.singular_name} (${model.names.singular_name}_schemas.Create): ${model.names.singular_name}
     """
     return await service.create(${model.names.singular_name}=${model.names.singular_name})
+%endif
 
-
+% if any((route.name == 'Update' and route.include) for route in model.routes):
 @router.put('/{${PRIMARY_KEY_NAME}}', response_model=${model.names.singular_name}_schemas.DB)
 async def update_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY_TYPE},
                           ${model.names.singular_name}: ${model.names.singular_name}_schemas.Update,
@@ -69,8 +71,9 @@ async def update_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"A ${model.names.singular_name} with ID: '{${PRIMARY_KEY_NAME}} was not found.",
     )
+%endif
 
-
+% if any((route.name == 'GetById' and route.include) for route in model.routes):
 @router.get('/{${PRIMARY_KEY_NAME}}', response_model=${model.names.singular_name}_schemas.DB)
 async def get_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY_TYPE},
                        service=fastapi.Depends(
@@ -88,8 +91,9 @@ async def get_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY_TY
         status_code=status.HTTP_404_NOT_FOUND,
         detail=f"A ${model.names.singular_name} with id: '{${PRIMARY_KEY_NAME}} was not found.",
     )
+% endif
 
-
+% if any((route.name == 'DeleteById' and route.include) for route in model.routes):
 @router.delete('/{${PRIMARY_KEY_NAME}}', response_model=${model.names.singular_name}_schemas.DB)
 async def delete_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY_TYPE},
                           service=fastapi.Depends(
@@ -101,3 +105,4 @@ async def delete_${model.names.singular_name}(${PRIMARY_KEY_NAME}: ${PRIMARY_KEY
         ${PRIMARY_KEY_NAME} (${PRIMARY_KEY_TYPE}): ${PRIMARY_KEY_NAME}
     """
     return await service.delete(${PRIMARY_KEY_NAME}=${PRIMARY_KEY_NAME})
+%endif
