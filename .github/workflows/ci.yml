@@ -17,7 +17,7 @@ jobs:
       - name: Lint
         uses: actions/setup-python@v2
         with:
-            python-verion: 3.8
+            python-version: 3.8
       - name: Lint
         run: |
             make lint
