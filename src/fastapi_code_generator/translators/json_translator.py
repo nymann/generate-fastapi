@@ -1,10 +1,14 @@
-from dataclasses import field
+"""[summary].
 
-from fastapi_code_generator.schemas import baseschemas
+Returns:
+    [type]: [description]
+"""
+
+import pydantic
 
 
-class JsonTranslator:
-    @staticmethod
+class JsonTranslator(pydantic.BaseModel):
+    """[summary]."""
     def translate_db_type(type_name):
         """translate_db_type.
 
@@ -18,7 +22,6 @@ class JsonTranslator:
             'date': 'Date',
             'datetime': 'DateTime',
             'string': 'String',
-            'string': 'String',
             'uuid': 'UUID',
             'boolean': 'Boolean',
             'integer': 'Integer',
@@ -26,29 +29,36 @@ class JsonTranslator:
         }
         return translate_dict.get(type_name)
 
-    @staticmethod
     def translate_field_to_db_dec(field):
+        """translate_field_to_db_dec.
+
+        Args:
+            field ([type]): [description]
+
+        Returns:
+            [type]: [description]
+        """
         line = [
             'DB.Column({0} = DB.{1}'.format(
                 field.name,
-                JsonTranslator.translate_db_type(field.type.name),
+                JsonTranslator.translate_db_type(field.field_type.name),
             ),
         ]
-        if field.type.max_length:
-            line.append('({0})'.format(field.type.max_length))
+        if field.field_type.max_length:
+            line.append('({0})'.format(field.field_type.max_length))
         else:
             line.append('()')
         if field.is_primary_key:
             line.append(', primary_key={0}'.format(str(field.is_primary_key)))
-        if field.type.default:
+        if field.field_type.default:
             line.append(
-                ', default=DB.Text(\"{0}\")'.format(field.type.default), )
-        if not field.type.nullable:
-            line.append(', nullable={0}'.format(field.type.nullable))
+                ', default=DB.Text(\"{0}\")'.format(
+                    field.field_type.default), )
+        if not field.field_type.nullable:
+            line.append(', nullable={0}'.format(field.field_type.nullable))
         line.append(')')
         return ''.join(line)
 
-    @staticmethod
     def translate_typename_to_pytypes(type_name):
         """translate_sql_type_to_pytypes.
 
@@ -67,11 +77,10 @@ class JsonTranslator:
             'boolean': 'bool',
             'integer': 'int',
             'double': 'float',
-            'float': 'float'
+            'float': 'float',
         }
         return translate_dict.get(type_name)
 
-    @staticmethod
     def translate_typename_to_rand_data(type_name):
         """translate_typename_to_rand_data.
 
@@ -94,7 +103,6 @@ class JsonTranslator:
         }
         return translate_dict.get(type_name)
 
-    @staticmethod
     def translate_pytype_to_rand_data(type_name):
         """translate_typename_to_rand_data.
 
@@ -115,7 +123,6 @@ class JsonTranslator:
         }
         return translate_dict.get(type_name)
 
-    @staticmethod
     def translate_typename_to_invalid_data(type_name):
         """translate_typename_to_rand_data.
 
@@ -135,22 +142,5 @@ class JsonTranslator:
             'integer': '\"notainteger\"',
             'double': '\"notadouble\"',
             'float': '\"notafloat\"',
-        }
-        return translate_dict.get(type_name)
-
-    @staticmethod
-    def translate_sql_type_to_import(type_name):
-        """translate_sql_type_to_import.
-
-        Args:
-            type_name ([type]): [description]
-
-        Returns:
-            [type]: [description]
-        """
-        translate_dict = {
-            'DATE': 'datetime',
-            'TIMESTAMP': 'datetime',
-            'UUID': 'pydantic',
         }
         return translate_dict.get(type_name)

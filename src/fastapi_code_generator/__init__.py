@@ -1,9 +1,12 @@
-""" Init: takes an SQL file and parses it and
+"""Init.
+
+Takes an SQL file and parses it and
 generates the required files and folders into the
 current working directory.(This will change)
 """
 import os
 import pathlib
+import sys
 
 import typer
 
@@ -21,15 +24,15 @@ def gen_dirs_and_files(
     """gen_dirs_and_files.
 
     Args:
-        sql_file ([type]): [description]
+        json_file ([type]): [description]
         targetpath ([type]): [description]
         project_name ([type]): [description]
         gen_additional_files ([type]): [description]
     """
     if not os.path.isdir(targetpath):
-        print(
-            "The target directory does not exist. Please try again with a different target path."
-        )
+        sys.stdout.write(
+            'The target directory does not exist.' +
+            'Please try again with a different target path.', )
         return
 
     templates_path = str(
@@ -39,8 +42,12 @@ def gen_dirs_and_files(
         ))
 
     models = json_parser.parse_json(json_file)
-    FastApiGenerator.gen_api_files(models, templates_path, targetpath,
-                                   project_name)
+    FastApiGenerator.gen_api_files(
+        models,
+        templates_path,
+        targetpath,
+        project_name,
+    )
 
 
 def main(
@@ -52,7 +59,7 @@ def main(
     """Run the main method.
 
     Args:
-        sql_file ([type]): [description]
+        json_file ([type]): [description]
         target_directory ([type]): [description]
         project_name ([type]): [description]
         gen_setup_files (bool): [description]. Defaults to typer_option.

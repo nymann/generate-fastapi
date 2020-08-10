@@ -30,8 +30,8 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 	@touch /tmp/.fastapi_code_generator_hooks_empty_target
 
 lint:
-	@pip install yapf pylint 'isort<5.0'
-	@pylint --rcfile=setup.cfg -r n src tests > pylint.txt
+	@pip install wemake-python-styleguide
+	@flake8 src --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
 
 install: ${VERSION}
 	@python3 setup.py develop
@@ -40,7 +40,8 @@ test: install
 	@python3 setup.py test
 
 fix: hooks
-	@autopep8 -ir src tests
+	@isort --recursive src tests -sg="**/mako_templates/**/*.py"
+	@autopep8 -ir src tests --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
 clean:
 	@find src tests | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 	@rm -rf \

@@ -6,7 +6,6 @@ registered.
 """
 
 from fastapi import FastAPI
-from requests import models
 
 % for model in models:
 from ${PROJECT_NAME}.core import version

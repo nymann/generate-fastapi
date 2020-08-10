@@ -24,7 +24,7 @@ class _Base(pydantic.BaseModel):
 
 % for field in model.fields:
     % if not field.is_primary_key:
-    ${field.name}: ${JsonTranslator.translate_typename_to_pytypes(field.type.name)}
+    ${field.name}: ${JsonTranslator.translate_typename_to_pytypes(field.field_type.name)}
     % endif
 % endfor
 

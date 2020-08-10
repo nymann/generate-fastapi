@@ -1,22 +1,17 @@
-""" Baseschemas.
+"""Baseschemas.
 
 Returns:
     [type]: [description]
 """
 
-import dataclasses
-from dataclasses import Field
-from typing import Dict, List, Optional
+from dataclasses import dataclass
+from typing import List, Optional
 
-import inflect
 import pydantic
-
-import sql_column_parser
 
 
 class FieldType(pydantic.BaseModel):
-    """ColumnType.
-    """
+    """FieldType."""
 
     name: str
     max_length: Optional[pydantic.conint(ge=1)]
@@ -25,38 +20,31 @@ class FieldType(pydantic.BaseModel):
     default: Optional[str] = None
 
 
-@dataclasses.dataclass
-class Field:
-    """Column.
-    """
+class Field(pydantic.BaseModel):
+    """Field."""
 
     name: str
-    type: FieldType
+    field_type: FieldType
     is_primary_key: bool
 
 
-@dataclasses.dataclass
-class Route:
-    """Column.
-    """
+class Route(pydantic.BaseModel):
+    """Route."""
 
     name: str
     include: bool
 
 
-@dataclasses.dataclass
-class Names():
-    """Names.
-    """
+class Names(pydantic.BaseModel):
+    """Names."""
 
     singular_name: str
     plural_name: str
 
 
-@dataclasses.dataclass
+@dataclass
 class Model:
-    """Table.
-    """
+    """Model."""
 
     fields: List[Field]
     routes: List[Route]

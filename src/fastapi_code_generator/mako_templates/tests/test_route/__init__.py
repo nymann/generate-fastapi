@@ -58,7 +58,7 @@ def mock_${model.names.singular_name}():
     return {
         % for field in model.fields:
         % if not field.is_primary_key:
-        "${field.name}": ${JsonTranslator.translate_typename_to_rand_data(field.type.name)},
+        "${field.name}": ${JsonTranslator.translate_typename_to_rand_data(field.field_type.name)},
         % endif
         % endfor
     }
@@ -67,7 +67,7 @@ def invalid_${model.names.singular_name}():
     return {
         % for field in model.fields:
         % if not field.is_primary_key:
-        "${field.name}": ${JsonTranslator.translate_typename_to_invalid_data(field.type.name)},
+        "${field.name}": ${JsonTranslator.translate_typename_to_invalid_data(field.field_type.name)},
         % endif
         % endfor
     }
