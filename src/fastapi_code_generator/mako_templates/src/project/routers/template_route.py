@@ -13,7 +13,7 @@ from starlette import status
 
 from ${PROJECT_NAME}.core import security, service_factory
 from ${PROJECT_NAME}.domain.${model.names.plural_name} import (
-    ${model.names., singular_name}_schemas)
+    ${model.names.singular_name}_schemas)
 
 router = fastapi.APIRouter()
 

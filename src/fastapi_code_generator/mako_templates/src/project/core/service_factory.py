@@ -1,6 +1,6 @@
 % for model in models:
 from ${PROJECT_NAME}.domain.${model.names.plural_name} import (
-    ${model.names., singular_name}_queries)
+    ${model.names.singular_name}_queries)
 from ${PROJECT_NAME}.domain.${model.names.plural_name}.${model.names.singular_name}_services import \
     Service
 

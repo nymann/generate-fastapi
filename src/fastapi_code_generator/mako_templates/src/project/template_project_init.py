@@ -8,11 +8,10 @@ registered.
 from fastapi import FastAPI
 from requests import models
 
+% for model in models:
 from ${PROJECT_NAME}.core import version
 from ${PROJECT_NAME}.core.db import DB
 from ${PROJECT_NAME}.routers import ${model.names.plural_name}_router
-
-% for model in models:
 % endfor
 
 def create_app() -> FastAPI:
