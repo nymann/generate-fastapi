@@ -21,11 +21,6 @@ jobs:
       - name: Lint
         run: |
             make lint
-      - name: Upload pylint.txt
-        uses: actions/upload-artifact@v1
-        with:
-          name: pylint
-          path: pylint.txt
 
   unittest-coverage:
     name: Run unittest and generate code coverage report.
