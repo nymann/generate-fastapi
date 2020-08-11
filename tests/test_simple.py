@@ -1,15 +1,7 @@
-"""Example Google style docstrings.
-
-"""
-
-
-def test_simple():
-    """test_simple.
-    """
-    assert 2 == something()
+import pytest
+from fastapi_code_generator.parsers import json_parser
 
 
-def something():
-    """something.
-    """
-    return 1 + 1
+def test_parser():
+    columns = json_parser.parse_json('example.json')
+    assert len(columns) == 1

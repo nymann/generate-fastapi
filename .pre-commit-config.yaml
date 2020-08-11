@@ -5,7 +5,6 @@ repos:
     -   id: trailing-whitespace
     -   id: check-merge-conflict
     -   id: check-yaml
-    -   id: trailing-whitespace
     -   id: no-commit-to-branch
     -   id: mixed-line-ending
     -   id: end-of-file-fixer
@@ -16,3 +15,4 @@ repos:
     rev: ''  # Use the sha / tag you want to point at
     hooks:
     -   id: yapf
+        exclude: /mako_templates/
