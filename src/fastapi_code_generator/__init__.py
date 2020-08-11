@@ -7,7 +7,7 @@ current working directory.(This will change)
 import os
 import pathlib
 import sys
-
+from git import Repo
 import typer
 
 from fastapi_code_generator.file_generators.fastapi_generator import \
@@ -19,7 +19,7 @@ def gen_dirs_and_files(
     json_file,
     targetpath,
     project_name,
-    gen_additional_files,
+    git_repo_url,
 ):
     """gen_dirs_and_files.
 
@@ -27,13 +27,16 @@ def gen_dirs_and_files(
         json_file ([type]): [description]
         targetpath ([type]): [description]
         project_name ([type]): [description]
-        gen_additional_files ([type]): [description]
+        git_repo ([type]): [description]
     """
     if not os.path.isdir(targetpath):
         sys.stdout.write(
             'The target directory does not exist.' +
             'Please try again with a different target path.', )
         return
+
+    if git_repo_url != '':
+        Repo.clone_from(git_repo_url, targetpath)
 
     templates_path = str(
         os.path.join(
@@ -54,7 +57,7 @@ def main(
         json_file,
         target_directory,
         project_name,
-        gen_setup_files: bool = typer.Option(False, '--gen_setup_files'),
+        git_repo_url: str = typer.Option('', '--from_repo'),
 ):
     """Run the main method.
 
@@ -62,13 +65,13 @@ def main(
         json_file ([type]): [description]
         target_directory ([type]): [description]
         project_name ([type]): [description]
-        gen_setup_files (bool): [description]. Defaults to typer_option.
+        git_repo_url (str): [description]. Defaults to typer_option.
     """
     gen_dirs_and_files(
         json_file,
         target_directory,
         project_name,
-        gen_setup_files,
+        git_repo_url,
     )
 
 
