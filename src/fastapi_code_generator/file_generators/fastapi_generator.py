@@ -58,6 +58,12 @@ class FastApiGenerator(pydantic.BaseModel):
 
 
 def _gen_model_file(model, template_path, target_path, project_name):
+    if os.path.exists(target_path):
+        sys.stdout.write(
+            'File {0} already exists. Keeping existing file\n'.format(
+                target_path))
+        return
+
     template = Template(filename=template_path)
 
     primary_key = _get_primary_key(model)
@@ -292,6 +298,12 @@ def _gen_model_domain_files(model, templates_path, project_dir, project_name):
 
 
 def _gen_file(template_path, target_path, project_name, models):
+    if os.path.exists(target_path):
+        sys.stdout.write(
+            'File {0} already exists. Keeping existing file\n'.format(
+                target_path))
+        return
+
     template = Template(filename=template_path)
 
     file_content = template.render(PROJECT_NAME=project_name, models=models)
