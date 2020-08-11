@@ -8,7 +8,7 @@ on:
 
 jobs:
   lint:
-    name: Run yapf in diff mode and pylint.
+    name: Run flake8.
 
     runs-on: ubuntu-latest
 

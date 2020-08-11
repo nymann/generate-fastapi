@@ -31,7 +31,7 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 
 lint:
 	@pip install wemake-python-styleguide
-	@flake8 src --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
+	@git diff -u | flake8 --diff src --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
 
 install: ${VERSION}
 	@python3 setup.py develop
