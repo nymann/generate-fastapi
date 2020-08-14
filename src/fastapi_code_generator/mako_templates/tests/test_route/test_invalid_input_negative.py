@@ -17,8 +17,7 @@ import requests
 from requests import exceptions
 
 from tests import test_${model.names.plural_name}, utils
-from tests.test_${model.names.plural_name} import \
-    mock_${model.names.singular_name}
+from tests.test_${model.names.plural_name} import mock_${model.names.singular_name}
 
 <%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
 

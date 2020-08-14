@@ -9,6 +9,7 @@ import sys
 
 import pydantic
 from mako.template import Template
+import shutil
 
 from fastapi_code_generator.schemas import baseschemas
 from fastapi_code_generator.translators.json_translator import JsonTranslator
@@ -47,7 +48,7 @@ class FastApiGenerator(pydantic.BaseModel):
                 target_path,
                 project_name,
             )
-            _gen_migrations(model, templates_path, target_path, project_name)
+            _gen_migrations(models, templates_path, target_path, project_name)
 
         _gen_test_file(models, templates_path, target_path, project_name)
         _gen_common_project_files(
@@ -58,20 +59,28 @@ class FastApiGenerator(pydantic.BaseModel):
         )
 
 
-def _gen_migrations(model, templates_path, target_path, project_name):
-    template_upgrade_dir = '{0}/migrations/versions/added_routes/upgrade.sql'.format(
+def _gen_migrations(models, templates_path, target_path, project_name):
+    for model in models:
+        template_upgrade_dir = '{0}/migrations/versions/added_routes/upgrade.sql'.format(
+            templates_path)
+        upgrade_dir = '{0}/migrations/versions/added_{1}/upgrade.sql'.format(
+            target_path, model.names.plural_name)
+
+        _gen_model_file(model, template_upgrade_dir, upgrade_dir, project_name)
+
+        template_downgrade_dir = '{0}/migrations/versions/added_routes/downgrade.sql'.format(
+            templates_path)
+        downgrade_dir = '{0}/migrations/versions/added_{1}/downgrade.sql'.format(
+            target_path, model.names.plural_name)
+
+        _gen_model_file(model, template_downgrade_dir, downgrade_dir,
+                        project_name)
+
+    template_script_dir = '{0}/migrations/script.py.mako'.format(
         templates_path)
-    upgrade_dir = '{0}/migrations/versions/added_{1}/upgrade.sql'.format(
-        target_path, model.names.plural_name)
+    script_dir = '{0}/migrations/'.format(target_path)
 
-    _gen_model_file(model, template_upgrade_dir, upgrade_dir, project_name)
-
-    template_downgrade_dir = '{0}/migrations/versions/added_routes/downgrade.sql'.format(
-        templates_path)
-    downgrade_dir = '{0}/migrations/versions/added_{1}/downgrade.sql'.format(
-        target_path, model.names.plural_name)
-
-    _gen_model_file(model, template_downgrade_dir, downgrade_dir, project_name)
+    shutil.copy(template_script_dir, script_dir)
 
 
 def _gen_model_file(model, template_path, target_path, project_name):
