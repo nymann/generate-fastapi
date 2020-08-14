@@ -1,5 +1,6 @@
 import inflect
 import re
+import sys
 
 from fastapi_code_generator.schemas import baseschemas
 from fastapi_code_generator.translators.sql_translator import SqlTranslator
@@ -34,7 +35,10 @@ def _parse_statements(statements):
         plural_name = pattern.match(statement).group(1)
         engine = inflect.engine()
         singular_name = engine.singular_noun(plural_name)
-
+        if singular_name == False:
+            input_text = 'No singular name found matching plural name: {0}.\nPlease provide a fitting singular name\n'.format(
+                plural_name)
+            singular_name = input(input_text)
         models.append(
             baseschemas.Model(
                 fields=_parse_fields(statement),

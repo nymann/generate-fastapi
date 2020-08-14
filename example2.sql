@@ -9,5 +9,6 @@ CREATE TABLE users (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (identifier,is_admin)
 );
+
 CREATE INDEX users_email_idx ON users USING btree (email);
 CREATE INDEX users_name_idx ON users USING btree (name);
