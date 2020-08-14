@@ -16,3 +16,9 @@ def test_names_correctly_parsed():
 def test_primary_key_correctly_parsed():
     assert any((field.name == 'identifier' and field.is_primary_key)
                for field in test_models[0].fields)
+
+
+def test_check_nullable_false_per_default():
+    assert any((field.name == 'registration_date'
+                and field.field_type.nullable == False)
+               for field in test_models[0].fields)
