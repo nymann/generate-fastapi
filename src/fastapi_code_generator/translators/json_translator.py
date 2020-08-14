@@ -59,6 +59,28 @@ class JsonTranslator(pydantic.BaseModel):
         line.append(')')
         return ''.join(line)
 
+    def translate_field_type_to_sql_type(field_type):
+        if field_type.name == 'string':
+            if field_type.max_length:
+                return 'VARCHAR({0})'.format(field_type.max_length)
+            else:
+                return 'TEXT'
+        else:
+            translate_dict = {
+                'date': 'DATE',
+                'datetime': 'TIMESTAMP',
+                'uuid': 'UUID',
+                'boolean': 'BOOLEAN',
+                'integer': 'INTEGER',
+                'double': 'DOUBLE',
+                'float': 'FLOAT',
+            }
+            if field_type.max_length:
+                return '{0}({1})'.format(translate_dict.get(field_type.name),
+                                         field_type.max_length)
+            else:
+                return translate_dict.get(field_type.name)
+
     def translate_typename_to_pytypes(type_name):
         """translate_sql_type_to_pytypes.
 

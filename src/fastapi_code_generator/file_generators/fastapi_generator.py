@@ -9,6 +9,7 @@ import sys
 
 import pydantic
 from mako.template import Template
+import shutil
 
 from fastapi_code_generator.schemas import baseschemas
 from fastapi_code_generator.translators.json_translator import JsonTranslator
@@ -47,6 +48,7 @@ class FastApiGenerator(pydantic.BaseModel):
                 target_path,
                 project_name,
             )
+            _gen_migrations(models, templates_path, target_path, project_name)
 
         _gen_test_file(models, templates_path, target_path, project_name)
         _gen_common_project_files(
@@ -55,6 +57,24 @@ class FastApiGenerator(pydantic.BaseModel):
             project_dir,
             project_name,
         )
+
+
+def _gen_migrations(models, templates_path, target_path, project_name):
+    for model in models:
+        template_upgrade_dir = '{0}/migrations/versions/added_routes/upgrade.sql'.format(
+            templates_path)
+        upgrade_dir = '{0}/migrations/versions/added_{1}/upgrade.sql'.format(
+            target_path, model.names.plural_name)
+
+        _gen_model_file(model, template_upgrade_dir, upgrade_dir, project_name)
+
+        template_downgrade_dir = '{0}/migrations/versions/added_routes/downgrade.sql'.format(
+            templates_path)
+        downgrade_dir = '{0}/migrations/versions/added_{1}/downgrade.sql'.format(
+            target_path, model.names.plural_name)
+
+        _gen_model_file(model, template_downgrade_dir, downgrade_dir,
+                        project_name)
 
 
 def _gen_model_file(model, template_path, target_path, project_name):
@@ -348,12 +368,16 @@ def _mk_folder_structure(target_path, project_dir, models):
         '{0}/domain'.format(project_dir),
         '{0}/routers'.format(project_dir),
         '{0}/tests'.format(target_path),
+        '{0}/migrations'.format(target_path),
+        '{0}/migrations/versions'.format(target_path),
     )
 
     for model in models:
         _mk_dir(
             '{0}/domain/{1}'.format(project_dir, model.names.plural_name),
             '{0}/tests/test_{1}'.format(target_path, model.names.plural_name),
+            '{0}/migrations/versions/added_{1}'.format(
+                target_path, model.names.plural_name),
         )
 
 
