@@ -1,5 +1,4 @@
 src/fastapi_code_generator/version.py
-*.sql
 .history
 .vscode/
 pylint.txt
