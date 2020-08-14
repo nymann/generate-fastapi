@@ -76,12 +76,6 @@ def _gen_migrations(models, templates_path, target_path, project_name):
         _gen_model_file(model, template_downgrade_dir, downgrade_dir,
                         project_name)
 
-    template_script_dir = '{0}/migrations/script.py.mako'.format(
-        templates_path)
-    script_dir = '{0}/migrations/'.format(target_path)
-
-    shutil.copy(template_script_dir, script_dir)
-
 
 def _gen_model_file(model, template_path, target_path, project_name):
     template = Template(filename=template_path)
