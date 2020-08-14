@@ -13,10 +13,11 @@ import typer
 from fastapi_code_generator.file_generators.fastapi_generator import \
     FastApiGenerator
 from fastapi_code_generator.parsers import json_parser
+from fastapi_code_generator.parsers import sql_parser
 
 
 def gen_dirs_and_files(
-    json_file,
+    file,
     targetpath,
     project_name,
     git_repo_url,
@@ -44,7 +45,13 @@ def gen_dirs_and_files(
             'mako_templates',
         ))
 
-    models = json_parser.parse_json(json_file)
+    models = []
+    if file.endswith('.sql'):
+        models = sql_parser.parse_sql(file)
+    if file.endswith('.json'):
+        models = json_parser.parse_json(file)
+
+    print(models)
     FastApiGenerator.gen_api_files(
         models,
         templates_path,
@@ -54,7 +61,7 @@ def gen_dirs_and_files(
 
 
 def main(
-        json_file,
+        file,
         target_directory,
         project_name,
         git_repo_url: str = typer.Option('', '--from_repo'),
@@ -62,13 +69,13 @@ def main(
     """Run the main method.
 
     Args:
-        json_file ([type]): [description]
+        file ([type]): sql or json file
         target_directory ([type]): [description]
         project_name ([type]): [description]
         git_repo_url (str): [description]. Defaults to typer_option.
     """
     gen_dirs_and_files(
-        json_file,
+        file,
         target_directory,
         project_name,
         git_repo_url,
