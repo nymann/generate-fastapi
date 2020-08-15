@@ -2,8 +2,8 @@
 .PHONY: install hooks lint install test fix clean help
 
 PLATFORM?=local
-TMP_HOOKS:=/tmp/.fastapi_code_generator_hooks_empty.target
-VERSION:=src/fastapi_code_generator/version.py
+TMP_HOOKS:=/tmp/.generate_fastapi_hooks_empty.target
+VERSION:=src/generate_fastapi/version.py
 
 .DEFAULT:help
 help:
@@ -15,7 +15,7 @@ help:
 	@printf "\e[92m%s\e[0m\n" "make lint"
 	@echo " - Autoformats code and sorts imports (unless running as 'ci')."
 	@printf "\e[92m%s\e[0m\n" "make run"
-	@echo " - runs fastapi_code_generator"
+	@echo " - runs generate_fastapi"
 
 ${VERSION}:
 	@echo "__version__ = \"$(shell git describe --tag --always | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')\"" > ${VERSION}
@@ -27,25 +27,31 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 	@pre-commit run --all-files || \
 		(printf "\e[93m%s\e[0m\n" "Run same make target again";exit 1)
 	@printf "\e[92m%s\e[0m\n" "Pre-commit hooks ran successfully"
-	@touch /tmp/.fastapi_code_generator_hooks_empty_target
+	@touch /tmp/.generate_fastapi_hooks_empty_target
 
 lint:
 	@pip install wemake-python-styleguide
-	@git diff -u | flake8 --diff src --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
+	@git diff -u | flake8 --diff src --exclude='src/generate_fastapi/mako_templates/**/*.py'
 
 install: ${VERSION}
 	@python3 setup.py develop
+
+deploy: ${VERSION}
+	@python3 -m pip install --upgrade pip
+	@pip install setuptools wheel twine
+	@python3 setup.py sdist bdist_wheel
+	@twine upload dist/*
 
 test: install
 	@python3 setup.py test
 
 fix: hooks
 	@isort --recursive src tests -sg="**/mako_templates/**/*.py"
-	@autopep8 -ir src tests --exclude='src/fastapi_code_generator/mako_templates/**/*.py'
+	@autopep8 -ir src tests --exclude='src/generate_fastapi/mako_templates/**/*.py'
 clean:
 	@find src tests | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 	@rm -rf \
-		src/fastapi_code_generator.egg-info/ \
+		src/generate_fastapi.egg-info/ \
 		.eggs/ \
 		.coverage \
 		htmlcov/ \

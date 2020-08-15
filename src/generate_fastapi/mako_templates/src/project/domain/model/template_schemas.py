@@ -14,7 +14,7 @@ import pydantic
 
 from ${PROJECT_NAME}.domain import base_schemas
 
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 class _Base(pydantic.BaseModel):
     """Used as baseclass for all other schemas inside this module.

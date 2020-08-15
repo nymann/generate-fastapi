@@ -11,8 +11,8 @@ import pydantic
 from mako.template import Template
 import shutil
 
-from fastapi_code_generator.schemas import baseschemas
-from fastapi_code_generator.translators.json_translator import JsonTranslator
+from generate_fastapi.schemas import baseschemas
+from generate_fastapi.translators.json_translator import JsonTranslator
 
 
 class FastApiGenerator(pydantic.BaseModel):

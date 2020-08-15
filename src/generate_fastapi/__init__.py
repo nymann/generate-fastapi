@@ -10,10 +10,10 @@ import sys
 from git import Repo
 import typer
 
-from fastapi_code_generator.file_generators.fastapi_generator import \
+from generate_fastapi.file_generators.fastapi_generator import \
     FastApiGenerator
-from fastapi_code_generator.parsers import json_parser
-from fastapi_code_generator.parsers import sql_parser
+from generate_fastapi.parsers import json_parser
+from generate_fastapi.parsers import sql_parser
 
 
 def gen_dirs_and_files(
@@ -61,19 +61,16 @@ def gen_dirs_and_files(
 
 
 def main(
-        file,
-        target_directory,
-        project_name,
-        git_repo_url: str = typer.Option('', '--from_repo'),
+        file: str = typer.Argument(
+            ...,
+            help="Path to a SQL upgrade migration or a JSON file"),
+        target_directory: str = typer.Option(
+            ".", help="Path to the target directory", prompt=True),
+        project_name: str = typer.Option(
+            ...,
+            help="Your project name fx. 'my_program'"),
+        git_repo_url: str = typer.Option(None, '--from_repo'),
 ):
-    """Run the main method.
-
-    Args:
-        file ([type]): sql or json file
-        target_directory ([type]): [description]
-        project_name ([type]): [description]
-        git_repo_url (str): [description]. Defaults to typer_option.
-    """
     gen_dirs_and_files(
         file,
         target_directory,

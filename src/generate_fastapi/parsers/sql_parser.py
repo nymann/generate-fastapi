@@ -1,8 +1,8 @@
 import inflect
 import re
 
-from fastapi_code_generator.schemas import baseschemas
-from fastapi_code_generator.translators.sql_translator import SqlTranslator
+from generate_fastapi.schemas import baseschemas
+from generate_fastapi.translators.sql_translator import SqlTranslator
 
 
 def parse_sql(path):

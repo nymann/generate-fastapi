@@ -1,5 +1,5 @@
 import pytest
-from fastapi_code_generator.parsers import json_parser
+from generate_fastapi.parsers import json_parser
 
 test_models = json_parser.parse_json('example.json')
 

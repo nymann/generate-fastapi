@@ -10,7 +10,7 @@ from requests import exceptions
 
 import mimesis
 
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 
 def random_string(length: int) -> str:

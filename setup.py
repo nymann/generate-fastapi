@@ -2,7 +2,7 @@ import setuptools
 from distutils import util
 
 version = dict()
-path = util.convert_path("src/fastapi_code_generator/version.py")
+path = util.convert_path("src/generate_fastapi/version.py")
 with open(path) as file:
     exec(file.read(), version)
 

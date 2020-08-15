@@ -18,7 +18,7 @@ from requests import exceptions
 from tests import test_${model.names.plural_name}, utils
 from tests.test_${model.names.plural_name} import mock_${model.names.singular_name}
 
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 def test_validate_status_codes(client):
     ${PRIMARY_KEY_NAME} = str(${JsonTranslator.translate_pytype_to_rand_data(PRIMARY_KEY_TYPE)})

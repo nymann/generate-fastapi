@@ -1,12 +1,12 @@
 import pytest
-from fastapi_code_generator.parsers import json_parser
+from generate_fastapi.parsers import json_parser
 import os
-import fastapi_code_generator
+import generate_fastapi
 
 
 def test_is_folders_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    fastapi_code_generator.gen_dirs_and_files('example.json', tmp_dir,
+    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
                                               'test_api', '')
 
     assert os.path.exists(tmp_dir / 'src')
@@ -23,7 +23,7 @@ def test_is_folders_created(tmpdir_factory):
 
 def test_model_files_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    fastapi_code_generator.gen_dirs_and_files('example.json', tmp_dir,
+    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
                                               'test_api', '')
 
     model_dir = tmp_dir / 'src' / 'test_api' / 'domain' / 'users'
@@ -36,7 +36,7 @@ def test_model_files_created(tmpdir_factory):
 
 def test_test_files_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    fastapi_code_generator.gen_dirs_and_files('example.json', tmp_dir,
+    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
                                               'test_api', '')
 
     tests_dir = tmp_dir / 'tests'

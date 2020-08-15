@@ -8,7 +8,7 @@ import json
 
 import inflect
 
-from fastapi_code_generator.schemas import baseschemas
+from generate_fastapi.schemas import baseschemas
 
 
 def parse_json(path):
