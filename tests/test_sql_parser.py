@@ -1,7 +1,7 @@
 import pytest
 from generate_fastapi.parsers import sql_parser
 
-test_models = sql_parser.parse_sql('example2.sql')
+test_models = sql_parser.parse_sql('examples/example2.sql')
 
 
 def test_one_model_is_parsed():

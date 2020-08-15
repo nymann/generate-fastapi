@@ -6,8 +6,8 @@ import generate_fastapi
 
 def test_is_folders_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
-                                              'test_api', '')
+    generate_fastapi.gen_dirs_and_files('examples/example.json', tmp_dir,
+                                        'test_api', '')
 
     assert os.path.exists(tmp_dir / 'src')
     assert os.path.exists(tmp_dir / 'src' / 'test_api')
@@ -23,8 +23,8 @@ def test_is_folders_created(tmpdir_factory):
 
 def test_model_files_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
-                                              'test_api', '')
+    generate_fastapi.gen_dirs_and_files('examples/example.json', tmp_dir,
+                                        'test_api', '')
 
     model_dir = tmp_dir / 'src' / 'test_api' / 'domain' / 'users'
 
@@ -36,8 +36,8 @@ def test_model_files_created(tmpdir_factory):
 
 def test_test_files_created(tmpdir_factory):
     tmp_dir = tmpdir_factory.mktemp('data')
-    generate_fastapi.gen_dirs_and_files('example.json', tmp_dir,
-                                              'test_api', '')
+    generate_fastapi.gen_dirs_and_files('examples/example.json', tmp_dir,
+                                        'test_api', '')
 
     tests_dir = tmp_dir / 'tests'
     assert os.path.isfile(tests_dir / 'conftest.py')

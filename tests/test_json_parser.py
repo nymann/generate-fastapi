@@ -1,7 +1,7 @@
 import pytest
 from generate_fastapi.parsers import json_parser
 
-test_models = json_parser.parse_json('example.json')
+test_models = json_parser.parse_json('examples/example.json')
 
 
 def test_one_model_is_parsed():
