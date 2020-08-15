@@ -36,7 +36,7 @@ def gen_dirs_and_files(
             'Please try again with a different target path.', )
         return
 
-    if git_repo_url != '':
+    if git_repo_url:
         Repo.clone_from(git_repo_url, targetpath)
 
     templates_path = str(
