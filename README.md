@@ -10,7 +10,7 @@ base template.
 Generates route(s) given an SQL migration file or JSON (see [examples](examples)).
 
 ```
-$ generate_fastapi --help                                                                                                                                                                         130 ↵
+$ generate_fastapi --help 
 Usage: generate_fastapi [OPTIONS] FILE
 
 Arguments:
