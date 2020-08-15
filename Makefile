@@ -18,7 +18,7 @@ help:
 	@echo " - runs fastapi_code_generator"
 
 ${VERSION}:
-	@echo "__version__ = \"$(shell git describe --always)\"" > ${VERSION}
+	@echo "__version__ = \"$(shell git describe --tag --always | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')\"" > ${VERSION}
 
 hooks:${TMP_HOOKS}
 ${TMP_HOOKS}:.pre-commit-config.yaml
