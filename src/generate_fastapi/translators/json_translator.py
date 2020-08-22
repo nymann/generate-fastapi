@@ -39,8 +39,7 @@ class JsonTranslator(pydantic.BaseModel):
             [type]: [description]
         """
         line = [
-            'DB.Column({0} = DB.{1}'.format(
-                field.name,
+            'DB.Column(DB.{1}'.format(
                 JsonTranslator.translate_db_type(field.field_type.name),
             ),
         ]
