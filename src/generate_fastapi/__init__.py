@@ -16,7 +16,7 @@ from generate_fastapi.parsers import json_parser
 from generate_fastapi.parsers import sql_parser
 
 
-def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_url: str = None):
+def gen_dirs_and_files(file: str, targetpath: str, project_name: str, clone: bool = False, git_repo_url: str= None):
     """gen_dirs_and_files.
 
     Args:
@@ -31,7 +31,7 @@ def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_u
             'Please try again with a different target path.', )
         return
 
-    if git_repo_url:
+    if clone:
         Repo.clone_from(git_repo_url, targetpath)
 
     templates_path = str(
@@ -60,7 +60,7 @@ file_arg: str = typer.Argument(
     help="Path to a SQL upgrade migration or a JSON file")
 
 target_dir_arg: str = typer.Option(
-    ".", help="Path to the target directory", prompt=True)
+    ".", help="Path to the target directory")
 
 project_name_arg: str = typer.Option(
     ...,
@@ -70,11 +70,16 @@ project_name_arg: str = typer.Option(
 def main(file: str = file_arg,
          target_directory: str = target_dir_arg,
          project_name: str = project_name_arg,
-         git_repo_url: str = typer.Option(None, '--from_repo')):
+         clone_base: bool = typer.Option(
+             False, help="Should base template be cloned?"),
+         git_repo_url: str = typer.Option("https://github.com/nymann/generate-fastapi", '--from-repo')):
     """Main entrypoint for the application
     """
-    gen_dirs_and_files(file=file, targetpath=target_directory,
-                       project_name=project_name, git_repo_url=git_repo_url)
+    gen_dirs_and_files(file=file,
+                       targetpath=target_directory,
+                       project_name=project_name,
+                       clone=clone_base,
+                       git_repo_url=git_repo_url)
 
 
 def entry_point():
