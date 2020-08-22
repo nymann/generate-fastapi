@@ -97,6 +97,10 @@ def _parse_routes(json_model):
 def _parse_names(singular_name):
     engine = inflect.engine()
     plural_name = engine.plural_noun(singular_name)
+    if plural_name == False:
+        plural_name = input(
+            'No plural name found matching singular name. Please provide a fitting plural name\n '
+        )
     return baseschemas.Names(
         singular_name=singular_name,
         plural_name=plural_name,
