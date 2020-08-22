@@ -16,7 +16,7 @@ from generate_fastapi.parsers import json_parser
 from generate_fastapi.parsers import sql_parser
 
 
-def gen_dirs_and_files(file: str, targetpath: str, project_name: str, clone: bool, git_repo_url: str):
+def gen_dirs_and_files(file: str, targetpath: str, project_name: str, clone: bool = False, git_repo_url: str= None):
     """gen_dirs_and_files.
 
     Args:
