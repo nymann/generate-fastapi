@@ -16,12 +16,7 @@ from generate_fastapi.parsers import json_parser
 from generate_fastapi.parsers import sql_parser
 
 
-def gen_dirs_and_files(
-    file,
-    targetpath,
-    project_name,
-    git_repo_url,
-):
+def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_url: str = None):
     """gen_dirs_and_files.
 
     Args:
@@ -60,23 +55,26 @@ def gen_dirs_and_files(
     )
 
 
-def main(
-        file: str = typer.Argument(
-            ...,
-            help="Path to a SQL upgrade migration or a JSON file"),
-        target_directory: str = typer.Option(
-            ".", help="Path to the target directory", prompt=True),
-        project_name: str = typer.Option(
-            ...,
-            help="Your project name fx. 'my_program'"),
-        git_repo_url: str = typer.Option(None, '--from_repo'),
-):
-    gen_dirs_and_files(
-        file,
-        target_directory,
-        project_name,
-        git_repo_url,
-    )
+file_arg: str = typer.Argument(
+    ...,
+    help="Path to a SQL upgrade migration or a JSON file")
+
+target_dir_arg: str = typer.Option(
+    ".", help="Path to the target directory", prompt=True)
+
+project_name_arg: str = typer.Option(
+    ...,
+    help="Your project name fx. 'my_program'"),
+
+
+def main(file: str = file_arg,
+         target_directory: str = target_dir_arg,
+         project_name: str = project_name_arg,
+         git_repo_url: str = typer.Option(None, '--from_repo')):
+    """Main entrypoint for the application
+    """
+    gen_dirs_and_files(file=file, targetpath=target_directory,
+                       project_name=project_name, git_repo_url=git_repo_url)
 
 
 def entry_point():
