@@ -3,7 +3,7 @@ from os import name
 
 from ${PROJECT_NAME}.core.db import DB
 
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 class Model(DB.Model):
     """Model.

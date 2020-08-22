@@ -1,4 +1,4 @@
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 CREATE TABLE ${model.names.plural_name}(
     % for field in model.fields:

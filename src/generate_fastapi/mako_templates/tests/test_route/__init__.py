@@ -7,7 +7,7 @@ from requests import exceptions
 
 from tests import utils
 
-<%! from fastapi_code_generator.translators.json_translator import JsonTranslator %>
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 
 ROUTE = "/${model.names.plural_name}/"
