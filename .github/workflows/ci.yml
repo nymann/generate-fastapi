@@ -1,4 +1,4 @@
-name: fastapi_code_generator CI
+name: generate_fastapi CI
 
 on:
   push:

@@ -1,4 +1,4 @@
-src/fastapi_code_generator/version.py
+src/generate_fastapi/version.py
 .history
 .vscode/
 pylint.txt

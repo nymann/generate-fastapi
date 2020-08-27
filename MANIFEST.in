@@ -1,1 +1,2 @@
 global-exclude *.pyc
+graft src/generate_fastapi/mako_templates
