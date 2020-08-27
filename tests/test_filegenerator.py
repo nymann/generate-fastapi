@@ -1,5 +1,4 @@
 import pytest
-from fastapi_code_generator.parsers import json_parser
 import os
 import fastapi_code_generator
 
