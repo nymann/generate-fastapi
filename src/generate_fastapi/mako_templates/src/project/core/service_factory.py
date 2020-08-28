@@ -1,10 +1,9 @@
 % for model in models:
-from ${PROJECT_NAME}.domain.${model.names.plural_name} import ${model.names.singular_name}_queries
-from ${PROJECT_NAME}.domain.${model.names.plural_name}.${model.names.singular_name}_services import Service
+from ${PROJECT_NAME}.domain.${model.names.plural_name} import ${model.names.singular_name}_queries, ${model.names.singular_name}_services
 %endfor
 
 % for model in models:
-def get_${model.names.singular_name}_services() -> Service:
+def get_${model.names.singular_name}_services() -> ${model.names.singular_name}_services.Service:
     """Gets an instance of `Service`.
 
     Routers that makes dependency injection
@@ -14,6 +13,6 @@ def get_${model.names.singular_name}_services() -> Service:
     Returns:
         ${model.names.singular_name}_services.Service:
     """
-    return Service(${model.names.singular_name}_queries.Queries())
+    return ${model.names.singular_name}_services.Service(${model.names.singular_name}_queries.Queries())
 
 %endfor
