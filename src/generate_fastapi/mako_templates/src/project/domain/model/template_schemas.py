@@ -8,13 +8,12 @@ from typing import List, Optional
 import datetime
 from dataclasses import field
 from os import name
-from xml.etree import ElementTree as ET
 
 import pydantic
 
 from ${PROJECT_NAME}.domain import base_schemas
 
-< %! from generate_fastapi.translators.json_translator import JsonTranslator % >
+<%! from generate_fastapi.translators.json_translator import JsonTranslator %>
 
 
 class _Base(pydantic.BaseModel):
