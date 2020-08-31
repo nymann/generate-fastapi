@@ -62,12 +62,10 @@ def _parse_fields(create_table_statement):
     for line in create_table_statement.split("\n")[1:-1]:
         line = line.strip()
         line = line.strip(",")
-        if _is_not_field(line=line):
-            if _parse_primary_keys(line):
-                primary_key_names.extend(_parse_primary_keys(line))
-            continue
-        field_texts.append(line)
-
+        if _parse_primary_keys(line):
+            primary_key_names.extend(_parse_primary_keys(line))
+        if not _is_not_field(line=line):
+            field_texts.append(line)
     fields = []
     for field_text in field_texts:
         fields.append(_parse_field(field_text, primary_key_names))
@@ -163,7 +161,12 @@ def _parse_primary_keys(line):
         line:
     """
     if not line.upper().startswith("PRIMARY"):
-        return
+        pattern = re.compile(r"^\s*(\S*).*PRIMARY KEY.*")
+        match = pattern.search(line)
+        if match:
+            return [match.group(1)]
+        else:
+            return []
     pattern = re.compile(r"\((\S*\,*)\)")
     match = pattern.search(line).group(1)
     match = match.replace(" ", "")

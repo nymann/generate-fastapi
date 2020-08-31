@@ -39,9 +39,8 @@ class JsonTranslator(pydantic.BaseModel):
             [type]: [description]
         """
         line = [
-            'DB.Column(DB.{1}'.format(
-                JsonTranslator.translate_db_type(field.field_type.name),
-            ),
+            'DB.Column(DB.{0}'.format(
+                JsonTranslator.translate_db_type(field.field_type.name), ),
         ]
         if field.field_type.max_length:
             line.append('({0})'.format(field.field_type.max_length))
