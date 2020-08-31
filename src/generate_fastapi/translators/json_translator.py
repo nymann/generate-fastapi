@@ -81,7 +81,7 @@ class JsonTranslator(pydantic.BaseModel):
                 return translate_dict.get(field_type.name)
 
     def translate_typename_to_pytypes(type_name):
-        """translate_sql_type_to_pytypes.
+        """translate_typename_to_pytypes.
 
         Args:
             type_name ([type]): [description]
