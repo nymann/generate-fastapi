@@ -8,7 +8,6 @@ from typing import List, Optional
 import datetime
 from dataclasses import field
 from os import name
-from xml.etree import ElementTree as ET
 
 import pydantic
 
