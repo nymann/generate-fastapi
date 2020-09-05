@@ -151,39 +151,43 @@ def _gen_project_init_file(templates_path, project_dir, project_name, models):
 
     if _gen_file(template_project_init, project_init, project_name, models):
         return
-    # TODO: Add the include_route and the import to the existing file
-    with open(project_init, "w") as file:
+    lines = list()
+    with open(project_init, "r") as file:
         lines = file.readlines()
+
+    with open(project_init, "w") as write_file:
         for model in models:
-            _include_route(file_content=lines,
-                           plural_name=model.names.plural_name)
+            lines = _include_route(file_content=lines,
+                                   plural_name=model.names.plural_name,
+                                   project_name=project_name)
+            write_file.writelines(lines)
 
 
 def _include_route(file_content: List[str], plural_name: str,
                    project_name: str):
-    index = _next_index_after_last_match(file_content=file_content,
-                                         search="import")
-    import_string = 'from {0}.routers import {1}_router'.format(
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search="from ")
+    import_string = 'from {0}.routers import {1}_router\n'.format(
         project_name, plural_name)
     file_content.insert(index, import_string)
 
     title = plural_name.title()
-    route_sentence = 'app.include_router({0}_router.router, tags=["{1}"], prefix="/{0}")'.format(
+    route_sentence = '    app.include_router({0}_router.router, tags=["{1}"], prefix="/{0}")\n'.format(
         plural_name, title)
-    index = _next_index_after_last_match(file_content=file_content,
-                                         search='app.include_router')
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search='app.include_router')
     file_content.insert(index, route_sentence)
     return file_content
 
 
-def _next_index_after_last_match(file_content: List[str], search: str):
+def find_suitable_position_in_file(file_content: List[str], search: str):
     for index, line in enumerate(file_content):
-        if search in line:
-            found_section = True
-        if found_section and search not in line:
-            return index
+        if search not in line:
+            continue
+        return index
     raise LookupError(
-        "Couldn't find an instance of the requested search word.")
+        "Couldn't find an instance of the requested search word: '{0}'.".
+        format(search))
 
 
 def _add_import(import_name: str,
@@ -194,8 +198,8 @@ def _add_import(import_name: str,
     else:
         import_statement = ""
     import_statement = "{0}import {1}".format(import_statement, import_name)
-    index = _next_index_after_last_match(file_content=file_content,
-                                         search="import")
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search="import")
     file_content.insert(index, import_statement)
     return file_content
 
