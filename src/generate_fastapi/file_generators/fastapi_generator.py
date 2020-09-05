@@ -17,7 +17,6 @@ from generate_fastapi.translators.json_translator import JsonTranslator
 
 class FastApiGenerator(pydantic.BaseModel):
     """[summary]."""
-
     @staticmethod
     def gen_api_files(models, templates_path, target_path, project_name):
         """gen_api_files.
@@ -123,7 +122,7 @@ def _gen_service_factory_file(
     models,
 ):
     template_service_factory_dir = (
-        '{0}/src/project/core/service_factory.py').format(templates_path)
+        '{0}/src/project/core/service_factory.py.mako').format(templates_path)
 
     service_factory_dir = '{0}/core/service_factory.py'.format(project_dir)
 
@@ -137,7 +136,7 @@ def _gen_service_factory_file(
 
 def _gen_base_schemas_file(templates_path, project_dir, project_name, models):
     template_base_schemas_dir = (
-        '{0}/src/project/domain/template_base_schemas.py'
+        '{0}/src/project/domain/template_base_schemas.py.mako'
     ).format(templates_path)
     base_schemas_dir = '{0}/domain/base_schemas.py'.format(project_dir)
 
@@ -150,7 +149,7 @@ def _gen_base_schemas_file(templates_path, project_dir, project_name, models):
 
 
 def _gen_project_init_file(templates_path, project_dir, project_name, models):
-    template_project_init = '{0}/src/project/template_project_init.py'.format(
+    template_project_init = '{0}/src/project/template_project_init.py.mako'.format(
         templates_path, )
     project_init = '{0}/__init__.py'.format(project_dir)
 
@@ -158,12 +157,12 @@ def _gen_project_init_file(templates_path, project_dir, project_name, models):
 
 
 def _gen_test_file(models, templates_path, target_path, project_name):
-    template_tests_util_dir = '{0}/tests/utils.py'.format(templates_path)
+    template_tests_util_dir = '{0}/tests/utils.py.mako'.format(templates_path)
     tests_utils_dir = '{0}/tests/utils.py'.format(target_path)
 
     _gen_file(template_tests_util_dir, tests_utils_dir, project_name, models)
 
-    template_conftest_dir = '{0}/tests/conftest.py'.format(templates_path)
+    template_conftest_dir = '{0}/tests/conftest.py.mako'.format(templates_path)
     conftest_dir = '{0}/tests/conftest.py'.format(target_path)
 
     _gen_file(template_conftest_dir, conftest_dir, project_name, models)
@@ -171,7 +170,7 @@ def _gen_test_file(models, templates_path, target_path, project_name):
 
 def _gen_test_route_init_file(model, templates_path, target_path,
                               project_name):
-    template_tests_route_init_dir = '{0}/tests/test_route/__init__.py'.format(
+    template_tests_route_init_dir = '{0}/tests/test_route/__init__.py.mako'.format(
         templates_path, )
     tests_route_init_dir = '{0}/tests/test_{1}/__init__.py'.format(
         target_path,
@@ -187,7 +186,7 @@ def _gen_test_route_init_file(model, templates_path, target_path,
 
 
 def _gen_route_bp_test_file(model, templates_path, target_path, project_name):
-    template_test_bp_dir = '{0}/tests/test_route/test_basic_positive.py'.format(
+    template_test_bp_dir = '{0}/tests/test_route/test_basic_positive.py.mako'.format(
         templates_path, )
     test_bp_dir = '{0}/tests/test_{1}/test_basic_positive.py'.format(
         target_path,
@@ -199,7 +198,7 @@ def _gen_route_bp_test_file(model, templates_path, target_path, project_name):
 
 def _gen_route_iin_test_file(model, templates_path, target_path, project_name):
     template_test_iin_dir = (
-        '{0}/tests/test_route/test_invalid_input_negative.py'
+        '{0}/tests/test_route/test_invalid_input_negative.py.mako'
     ).format(templates_path)
     test_iin_dir = '{0}/tests/test_{1}/test_invalid_input_negative.py'.format(
         target_path,
@@ -210,8 +209,9 @@ def _gen_route_iin_test_file(model, templates_path, target_path, project_name):
 
 
 def _gen_route_ep_test_file(model, templates_path, target_path, project_name):
-    template_test_ep_dir = ('{0}/tests/test_route/test_extended_positive.py'
-                            ).format(templates_path)
+    template_test_ep_dir = (
+        '{0}/tests/test_route/test_extended_positive.py.mako'
+    ).format(templates_path)
     test_ep_dir = '{0}/tests/test_{1}/test_extended_positive.py'.format(
         target_path,
         model.names.plural_name,
@@ -222,7 +222,7 @@ def _gen_route_ep_test_file(model, templates_path, target_path, project_name):
 
 def _gen_route_dest_test_file(model, templates_path, target_path,
                               project_name):
-    template_test_dest_dir = '{0}/tests/test_route/test_destructive.py'.format(
+    template_test_dest_dir = '{0}/tests/test_route/test_destructive.py.mako'.format(
         templates_path, )
     test_dest_dir = '{0}/tests/test_{1}/test_destructive.py'.format(
         target_path,
@@ -245,7 +245,7 @@ def _gen_model_test_files(model, templates_path, target_path, project_name):
 
 
 def _gen_model_route_file(model, templates_path, project_dir, project_name):
-    template_routers_dir = '{0}/src/project/routers/template_route.py'.format(
+    template_routers_dir = '{0}/src/project/routers/template_route.py.mako'.format(
         templates_path, )
 
     routers_dir = '{0}/routers/{1}_route.py'.format(
@@ -258,7 +258,7 @@ def _gen_model_route_file(model, templates_path, project_dir, project_name):
 
 def _gen_model_service_file(model, templates_path, project_dir, project_name):
     template_services_dir = (
-        '{0}/src/project/domain/model/template_services.py'
+        '{0}/src/project/domain/model/template_services.py.mako'
     ).format(templates_path)
 
     services_dir = '{0}/domain/{1}/{2}_services.py'.format(
@@ -271,8 +271,9 @@ def _gen_model_service_file(model, templates_path, project_dir, project_name):
 
 
 def _gen_model_queries_file(model, templates_path, project_dir, project_name):
-    template_queries_dir = ('{0}/src/project/domain/model/template_queries.py'
-                            ).format(templates_path)
+    template_queries_dir = (
+        '{0}/src/project/domain/model/template_queries.py.mako'
+    ).format(templates_path)
 
     queries_dir = ('{0}/domain/{1}/{2}_queries.py'.format(
         project_dir,
@@ -284,7 +285,7 @@ def _gen_model_queries_file(model, templates_path, project_dir, project_name):
 
 
 def _gen_domain_model_file(model, templates_path, project_dir, project_name):
-    template_model_dir = ('{0}/src/project/domain/model/template_model.py'
+    template_model_dir = ('{0}/src/project/domain/model/template_model.py.mako'
                           ).format(templates_path)
 
     model_dir = '{0}/domain/{1}/{2}_model.py'.format(
@@ -297,8 +298,9 @@ def _gen_domain_model_file(model, templates_path, project_dir, project_name):
 
 
 def _gen_model_schemas_file(model, templates_path, project_dir, project_name):
-    template_schemas_dir = ('{0}/src/project/domain/model/template_schemas.py'
-                            ).format(templates_path)
+    template_schemas_dir = (
+        '{0}/src/project/domain/model/template_schemas.py.mako'
+    ).format(templates_path)
 
     schemas_dir = ('{0}/domain/{1}/{2}_schemas.py'.format(
         project_dir,
