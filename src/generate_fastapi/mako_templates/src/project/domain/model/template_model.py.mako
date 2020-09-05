@@ -1,5 +1,8 @@
-from dataclasses import field, fields
-from os import name
+"""Object-relational mapping between the ${PLURAL_NAME} database table and it's
+python counter part
+"""
+<%! from dataclasses import field, fields %>
+<%! from os import name %>
 
 from ${PROJECT_NAME}.core.db import DB
 

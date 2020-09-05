@@ -91,7 +91,7 @@ def _gen_model_file(model, template_path, target_path, project_name):
             primary_key.field_type.name, ),
         PRIMARY_KEY_NAME=primary_key.name,
         PROJECT_NAME=project_name,
-    )
+        PLURAL_NAME=model.names.plural_name)
 
     with open(target_path, 'w') as target_file:
         target_file.write(file_content)
@@ -167,12 +167,12 @@ def _include_route(file_content: List[str], plural_name: str,
                    project_name: str):
     index = find_suitable_position_in_file(file_content=file_content,
                                            search="from ")
-    import_string = 'from {0}.routers import {1}_router\n'.format(
+    import_string = 'from {0}.routers import {1}_route\n'.format(
         project_name, plural_name)
     file_content.insert(index, import_string)
 
     title = plural_name.title()
-    route_sentence = '    app.include_router({0}_router.router, tags=["{1}"], prefix="/{0}")\n'.format(
+    route_sentence = '    app.include_router({0}_route.router, tags=["{1}"], prefix="/{0}")\n'.format(
         plural_name, title)
     index = find_suitable_position_in_file(file_content=file_content,
                                            search='app.include_router')
