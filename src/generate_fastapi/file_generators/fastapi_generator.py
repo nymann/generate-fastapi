@@ -153,7 +153,9 @@ def _gen_project_init_file(templates_path, project_dir, project_name, models):
         templates_path, )
     project_init = '{0}/__init__.py'.format(project_dir)
 
-    _gen_file(template_project_init, project_init, project_name, models)
+    if _gen_file(template_project_init, project_init, project_name, models):
+        return
+    # TODO: Add the include_route and the import to the existing file
 
 
 def _gen_test_file(models, templates_path, target_path, project_name):
@@ -321,12 +323,12 @@ def _gen_model_domain_files(model, templates_path, project_dir, project_name):
     _gen_model_schemas_file(model, templates_path, project_dir, project_name)
 
 
-def _gen_file(template_path, target_path, project_name, models):
+def _gen_file(template_path, target_path, project_name, models) -> bool:
     if os.path.exists(target_path):
         sys.stdout.write(
             'File {0} already exists. Keeping existing file\n'.format(
                 target_path))
-        return
+        return False
 
     template = Template(filename=template_path)
 
@@ -334,6 +336,7 @@ def _gen_file(template_path, target_path, project_name, models):
 
     with open(target_path, 'w') as target_file:
         target_file.write(file_content)
+    return True
 
 
 def _get_primary_key(model: baseschemas.Model):
