@@ -11,12 +11,15 @@ from git import Repo
 import typer
 
 from generate_fastapi.file_generators.fastapi_generator import \
-    FastApiGenerator
+        FastApiGenerator
 from generate_fastapi.parsers import json_parser
 from generate_fastapi.parsers import sql_parser
 
 
-def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_url: str = None):
+def gen_dirs_and_files(file: str,
+                       targetpath: str,
+                       project_name: str,
+                       git_repo_url: str = None):
     """gen_dirs_and_files.
 
     Args:
@@ -36,10 +39,7 @@ def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_u
 
     templates_path = str(
         os.path.join(
-            pathlib.Path(__file__).parent.absolute(),
-            'mako_templates',
-        ))
-
+            pathlib.Path(__file__).parent.absolute(), 'mako_templates'))
     models = []
     if file.endswith('.sql'):
         models = sql_parser.parse_sql(file)
@@ -56,15 +56,14 @@ def gen_dirs_and_files(file: str, targetpath: str, project_name: str, git_repo_u
 
 
 file_arg: str = typer.Argument(
-    ...,
-    help="Path to a SQL upgrade migration or a JSON file")
+    ..., help="Path to a SQL upgrade migration or a JSON file")
 
-target_dir_arg: str = typer.Option(
-    ".", help="Path to the target directory", prompt=True)
+target_dir_arg: str = typer.Option(".",
+                                   help="Path to the target directory",
+                                   prompt=True)
 
-project_name_arg: str = typer.Option(
-    ...,
-    help="Your project name fx. 'my_program'"),
+project_name_arg: str = typer.Option(...,
+                                     help="Your project name fx. 'my_program'")
 
 
 def main(file: str = file_arg,
@@ -73,8 +72,10 @@ def main(file: str = file_arg,
          git_repo_url: str = typer.Option(None, '--from_repo')):
     """Main entrypoint for the application
     """
-    gen_dirs_and_files(file=file, targetpath=target_directory,
-                       project_name=project_name, git_repo_url=git_repo_url)
+    gen_dirs_and_files(file=file,
+                       targetpath=target_directory,
+                       project_name=project_name,
+                       git_repo_url=git_repo_url)
 
 
 def entry_point():

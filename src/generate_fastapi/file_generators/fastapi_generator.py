@@ -3,7 +3,7 @@
 Returns:
     [type]: [description]
 """
-
+from typing import List
 import os
 import sys
 
@@ -52,12 +52,8 @@ class FastApiGenerator(pydantic.BaseModel):
             _gen_migrations(models, templates_path, target_path, project_name)
 
         _gen_test_file(models, templates_path, target_path, project_name)
-        _gen_common_project_files(
-            models,
-            templates_path,
-            project_dir,
-            project_name,
-        )
+        _gen_common_project_files(models, templates_path, project_dir,
+                                  project_name)
 
 
 def _gen_migrations(models, templates_path, target_path, project_name):
@@ -153,7 +149,59 @@ def _gen_project_init_file(templates_path, project_dir, project_name, models):
         templates_path, )
     project_init = '{0}/__init__.py'.format(project_dir)
 
-    _gen_file(template_project_init, project_init, project_name, models)
+    if _gen_file(template_project_init, project_init, project_name, models):
+        return
+    lines = list()
+    with open(project_init, "r") as file:
+        lines = file.readlines()
+
+    with open(project_init, "w") as write_file:
+        for model in models:
+            lines = _include_route(file_content=lines,
+                                   plural_name=model.names.plural_name,
+                                   project_name=project_name)
+            write_file.writelines(lines)
+
+
+def _include_route(file_content: List[str], plural_name: str,
+                   project_name: str):
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search="from ")
+    import_string = 'from {0}.routers import {1}_router\n'.format(
+        project_name, plural_name)
+    file_content.insert(index, import_string)
+
+    title = plural_name.title()
+    route_sentence = '    app.include_router({0}_router.router, tags=["{1}"], prefix="/{0}")\n'.format(
+        plural_name, title)
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search='app.include_router')
+    file_content.insert(index, route_sentence)
+    return file_content
+
+
+def find_suitable_position_in_file(file_content: List[str], search: str):
+    for index, line in enumerate(file_content):
+        if search not in line:
+            continue
+        return index
+    raise LookupError(
+        "Couldn't find an instance of the requested search word: '{0}'.".
+        format(search))
+
+
+def _add_import(import_name: str,
+                file_content: List[str],
+                from_name: str = None):
+    if from_name:
+        import_statement = "from {0} ".format(from_name)
+    else:
+        import_statement = ""
+    import_statement = "{0}import {1}".format(import_statement, import_name)
+    index = find_suitable_position_in_file(file_content=file_content,
+                                           search="import")
+    file_content.insert(index, import_statement)
+    return file_content
 
 
 def _gen_test_file(models, templates_path, target_path, project_name):
@@ -321,12 +369,12 @@ def _gen_model_domain_files(model, templates_path, project_dir, project_name):
     _gen_model_schemas_file(model, templates_path, project_dir, project_name)
 
 
-def _gen_file(template_path, target_path, project_name, models):
+def _gen_file(template_path, target_path, project_name, models) -> bool:
     if os.path.exists(target_path):
         sys.stdout.write(
             'File {0} already exists. Keeping existing file\n'.format(
                 target_path))
-        return
+        return False
 
     template = Template(filename=template_path)
 
@@ -334,6 +382,7 @@ def _gen_file(template_path, target_path, project_name, models):
 
     with open(target_path, 'w') as target_file:
         target_file.write(file_content)
+    return True
 
 
 def _get_primary_key(model: baseschemas.Model):
