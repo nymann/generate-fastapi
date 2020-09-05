@@ -3,7 +3,7 @@
 Returns:
     [type]: [description]
 """
-
+from typing import List
 import os
 import sys
 
@@ -52,12 +52,8 @@ class FastApiGenerator(pydantic.BaseModel):
             _gen_migrations(models, templates_path, target_path, project_name)
 
         _gen_test_file(models, templates_path, target_path, project_name)
-        _gen_common_project_files(
-            models,
-            templates_path,
-            project_dir,
-            project_name,
-        )
+        _gen_common_project_files(models, templates_path, project_dir,
+                                  project_name)
 
 
 def _gen_migrations(models, templates_path, target_path, project_name):
@@ -156,6 +152,52 @@ def _gen_project_init_file(templates_path, project_dir, project_name, models):
     if _gen_file(template_project_init, project_init, project_name, models):
         return
     # TODO: Add the include_route and the import to the existing file
+    with open(project_init, "w") as file:
+        lines = file.readlines()
+        for model in models:
+            _include_route(file_content=lines,
+                           plural_name=model.names.plural_name)
+
+
+def _include_route(file_content: List[str], plural_name: str,
+                   project_name: str):
+    index = _next_index_after_last_match(file_content=file_content,
+                                         search="import")
+    import_string = 'from {0}.routers import {1}_router'.format(
+        project_name, plural_name)
+    file_content.insert(index, import_string)
+
+    title = plural_name.title()
+    route_sentence = 'app.include_router({0}_router.router, tags=["{1}"], prefix="/{0}")'.format(
+        plural_name, title)
+    index = _next_index_after_last_match(file_content=file_content,
+                                         search='app.include_router')
+    file_content.insert(index, route_sentence)
+    return file_content
+
+
+def _next_index_after_last_match(file_content: List[str], search: str):
+    for index, line in enumerate(file_content):
+        if search in line:
+            found_section = True
+        if found_section and search not in line:
+            return index
+    raise LookupError(
+        "Couldn't find an instance of the requested search word.")
+
+
+def _add_import(import_name: str,
+                file_content: List[str],
+                from_name: str = None):
+    if from_name:
+        import_statement = "from {0} ".format(from_name)
+    else:
+        import_statement = ""
+    import_statement = "{0}import {1}".format(import_statement, import_name)
+    index = _next_index_after_last_match(file_content=file_content,
+                                         search="import")
+    file_content.insert(index, import_statement)
+    return file_content
 
 
 def _gen_test_file(models, templates_path, target_path, project_name):
