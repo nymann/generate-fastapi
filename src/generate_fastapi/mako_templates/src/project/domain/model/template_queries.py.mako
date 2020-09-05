@@ -1,4 +1,5 @@
-import datetime
+"""This module is for all ${model.names.singular_name} related queries
+"""
 from typing import List, Tuple
 
 import pydantic
@@ -13,6 +14,8 @@ Model = ${model.names.singular_name}_model.Model
 
 
 class Queries():
+    """Queries
+    """
 
     async def create(self, ${model.names.singular_name}: CreateSchema) -> Model:
         return await Model.create(**${model.names.singular_name}.__dict__)
@@ -38,4 +41,4 @@ class Queries():
                      new_${model.names.singular_name}: UpdateSchema) -> Model:
         updated_${model.names.singular_name} = await old_${model.names.singular_name}.update(**new_${model.names.singular_name}.__dict__
                                                      ).apply()
-        return updated_${model.names.singular_name}._instance
+        return updated_${model.names.singular_name}._instance # pylint: disable=protected-access

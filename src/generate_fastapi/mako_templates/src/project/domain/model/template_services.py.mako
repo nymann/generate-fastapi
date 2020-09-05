@@ -6,8 +6,6 @@ creating an instance of Service() you shouldn't call
 `service._queries()` directly, hence why it's declared as private (_).
 """
 
-from typing import List, Optional
-
 import pydantic
 
 from ${PROJECT_NAME}.domain import base_schemas

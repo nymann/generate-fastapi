@@ -6,8 +6,6 @@ paginated result (`Paginated`) and transforming a ${model.names.singular_name}
 """
 from typing import List, Optional
 import datetime
-from dataclasses import field
-from os import name
 
 import pydantic
 
