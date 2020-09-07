@@ -51,7 +51,7 @@ class JsonTranslator(pydantic.BaseModel):
             line.append(', primary_key={0}'.format(str(field.is_primary_key)))
         if field.field_type.default:
             line.append(
-                ', default=DB.Text(\"{0}\")'.format(
+                ', default=DB.text(\"{0}\")'.format(
                     field.field_type.default), )
         if not field.field_type.nullable:
             line.append(', nullable={0}'.format(field.field_type.nullable))
