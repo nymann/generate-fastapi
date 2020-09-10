@@ -21,13 +21,13 @@ def test_validate_status_codes(client):
     ${model.names.singular_name} = test_${model.names.plural_name}.mock_${model.names.singular_name}()
 
     # Get ${model.names.singular_name} list should give 200 OK
-    data, status_code = test_${model.names.plural_name}.get_${model.names.plural_name}(client=client, from_date=datetime.datetime.min,to_date=datetime.datetime.max)
+    data, status_code = test_${model.names.plural_name}.get_${model.names.plural_name}(client=client)
     assert status_code == 200
 
     # For create methods we expect 201 Created
     data, status_code = test_${model.names.plural_name}.create_${model.names.singular_name}(client=client,
                                                        ${model.names.singular_name}=${model.names.singular_name})
-    assert status_code == 200
+    assert status_code == 201
     ${PRIMARY_KEY_NAME} = data["${PRIMARY_KEY_NAME}"]
 
     # Retrieve, we expect 200 OK here.
