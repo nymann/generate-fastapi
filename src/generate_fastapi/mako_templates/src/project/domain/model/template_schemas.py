@@ -26,12 +26,9 @@ class _Base(pydantic.BaseModel):
 % for field in model.fields:
     % if not field.is_primary_key:
     % if field.field_type.nullable:
-    < %! from generate_fastapi.translators.json_translator import JsonTranslator % >
-    ${field.name}: Optional[${JsonTranslator.translate_typename_to_pytypes(field.field_type.name)}] = pydantic.Field(None${', max_length='+str(field.field_type.max_length) if field.field_type.max_length else ''}
-                                                                                                                     ${', min_length='+str(field.field_type.min_length) if field.field_type.min_length else ''})
+    ${field.name}: Optional[${JsonTranslator.translate_typename_to_pytypes(field.field_type.name)}] = pydantic.Field(None${', max_length='+str(field.field_type.max_length) if field.field_type.max_length else ''} ${', min_length='+str(field.field_type.min_length) if field.field_type.min_length else ''})
     % else:
-    ${field.name}: ${JsonTranslator.translate_typename_to_pytypes(field.field_type.name)} = pydantic.Field(...${', max_length='+str(field.field_type.max_length) if field.field_type.max_length else ''}
-                                                                                                           ${', min_length='+str(field.field_type.min_length) if field.field_type.min_length else ''})
+    ${field.name}: ${JsonTranslator.translate_typename_to_pytypes(field.field_type.name)} = pydantic.Field(...${', max_length='+str(field.field_type.max_length) if field.field_type.max_length else ''} ${', min_length='+str(field.field_type.min_length) if field.field_type.min_length else ''})
     %endif
     %endif
 % endfor
