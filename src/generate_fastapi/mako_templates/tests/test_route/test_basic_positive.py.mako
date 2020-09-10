@@ -21,7 +21,7 @@ def test_validate_status_codes(client):
     ${model.names.singular_name} = test_${model.names.plural_name}.mock_${model.names.singular_name}()
 
     # Get ${model.names.singular_name} list should give 200 OK
-    data, status_code = test_${model.names.plural_name}.get_${model.names.plural_name}(client=client, from_date=datetime.datetime.min,to_date=datetime.datetime.max)
+    data, status_code = test_${model.names.plural_name}.get_${model.names.plural_name}(client=client)
     assert status_code == 200
 
     # For create methods we expect 201 Created
