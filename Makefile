@@ -29,12 +29,11 @@ ${TMP_HOOKS}:.pre-commit-config.yaml
 	@printf "\e[92m%s\e[0m\n" "Pre-commit hooks ran successfully"
 	@touch /tmp/.generate_fastapi_hooks_empty_target
 
-lint:
-	@pip install wemake-python-styleguide
+lint: install
 	@git diff -u | flake8 --diff src --exclude='src/generate_fastapi/mako_templates/**/*.py'
 
 install: ${VERSION}
-	@python3 setup.py develop
+	@pip install -e '.[dev]'
 
 deploy: ${VERSION}
 	@python3 -m pip install --upgrade pip
@@ -46,8 +45,9 @@ test: install
 	@python3 setup.py test
 
 fix: hooks
-	@isort --recursive src tests -sg="**/mako_templates/**/*.py"
+	@isort src tests -sg="**/mako_templates/**/*.py"
 	@autopep8 -ir src tests --exclude='src/generate_fastapi/mako_templates/**/*.py'
+
 clean:
 	@find src tests | grep -E "(__pycache__|\.pyc)" | xargs rm -rf
 	@rm -rf \

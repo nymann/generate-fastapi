@@ -9,7 +9,6 @@ import sys
 
 import pydantic
 from mako.template import Template
-import shutil
 
 from generate_fastapi.schemas import baseschemas
 from generate_fastapi.translators.json_translator import JsonTranslator
@@ -58,16 +57,16 @@ class FastApiGenerator(pydantic.BaseModel):
 
 def _gen_migrations(models, templates_path, target_path, project_name):
     for model in models:
-        template_upgrade_dir = '{0}/migrations/versions/added_routes/upgrade.sql'.format(
+        template_upgrade_dir = '{0}/migrations/versions/added_routes/upgrade.sql.mako'.format(
             templates_path)
         upgrade_dir = '{0}/migrations/versions/added_{1}/upgrade.sql'.format(
             target_path, model.names.plural_name)
 
         _gen_model_file(model, template_upgrade_dir, upgrade_dir, project_name)
 
-        template_downgrade_dir = '{0}/migrations/versions/added_routes/downgrade.sql'.format(
+        template_downgrade_dir = '{0}/migrations/versions/added_routes/downgrade.sql.mako'.format(
             templates_path)
-        downgrade_dir = '{0}/migrations/versions/added_{1}/downgrade.sql'.format(
+        downgrade_dir = '{0}/migrations/versions/added_{1}/downgrade.sql.mako'.format(
             target_path, model.names.plural_name)
 
         _gen_model_file(model, template_downgrade_dir, downgrade_dir,
@@ -268,8 +267,12 @@ def _gen_route_ep_test_file(model, templates_path, target_path, project_name):
     _gen_model_file(model, template_test_ep_dir, test_ep_dir, project_name)
 
 
-def _gen_route_dest_test_file(model, templates_path, target_path,
-                              project_name):
+def _gen_route_dest_test_file(
+    model,
+    templates_path,
+    target_path,
+    project_name,
+):
     template_test_dest_dir = '{0}/tests/test_route/test_destructive.py.mako'.format(
         templates_path, )
     test_dest_dir = '{0}/tests/test_{1}/test_destructive.py'.format(
@@ -282,13 +285,9 @@ def _gen_route_dest_test_file(model, templates_path, target_path,
 
 def _gen_model_test_files(model, templates_path, target_path, project_name):
     _gen_test_route_init_file(model, templates_path, target_path, project_name)
-
     _gen_route_bp_test_file(model, templates_path, target_path, project_name)
-
     _gen_route_iin_test_file(model, templates_path, target_path, project_name)
-
     _gen_route_ep_test_file(model, templates_path, target_path, project_name)
-
     _gen_route_dest_test_file(model, templates_path, target_path, project_name)
 
 
